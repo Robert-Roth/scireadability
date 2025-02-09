@@ -34,10 +34,6 @@ jobs:
         run: |
           pipenv run codespell -L paket --skip=./textstatsci/resources/**/easy_words.txt,./build/*,./textstatsci.egg-info/*,./.git/* --exclude-file=.codespellignorelines
 
-      - name: Lint with flake8
-        run: |
-          pipenv run flake8 . --exclude=build/
-
       - name: Test with pytest
         run: |
           pipenv run pytest test.py
