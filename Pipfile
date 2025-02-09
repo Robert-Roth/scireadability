@@ -8,6 +8,7 @@ Pyphen = "*"
 cmudict = "*"
 "repoze.lru" = "*"
 setuptools = "*"
+appdirs = "*"
 
 [dev-packages]
 codespell = "*"
