@@ -126,7 +126,7 @@ class textstatistics:
     text_encoding : str
         Default: "utf-8"
     __lang : str
-        Default : "en_US"
+        Default : "en"
     __round_outputs : bool
         Whether to round floating point outputs. Default: False
     __round_points : int or None
@@ -142,7 +142,7 @@ class textstatistics:
         in common English contractions. Default: False
     """
 
-    __lang = "en_US"
+    __lang = "en"
     __easy_word_sets = {}
     __round_outputs = False
     __round_points = None
@@ -183,7 +183,7 @@ class textstatistics:
         add_terms_from_file(file_path, lang)
         self.custom_dict = load_custom_syllable_dict(lang)
 
-    def revert_dictionary_to_default(self, lang="en_US"):
+    def revert_dictionary_to_default(self, lang="en"):
         """API to revert the custom dictionary to the default."""
         revert_custom_dict_to_default(lang)
 
@@ -263,13 +263,13 @@ class textstatistics:
     def set_lang(self, lang: str) -> None:
         """Set the language and load appropriate resources."""
         self.__lang = lang
-        if lang == "en_US":
+        if lang == "en":
             self.cmu_dict = cmudict.dict()
         else:
             self.cmu_dict = None  # CMUdict only for English
 
         # Only load Pyphen if NOT English
-        if lang != "en_US":
+        if lang != "en":
             try:
                 self.pyphen = Pyphen(lang=self.__lang)
             except pkg_resources.DistributionNotFound:
@@ -449,7 +449,7 @@ class textstatistics:
                 continue  # Skip to the next word if found in custom_dict
 
             # 2. Language-Specific Dictionaries
-            if self.__lang == "en_US":
+            if self.__lang == "en":
                 # 2a. English: CMUdict
                 try:
                     cmu_phones = self.cmu_dict[word][0]
@@ -464,7 +464,7 @@ class textstatistics:
                 continue  # Skip to next word if Pyphen used
 
             # 3. Regex Fallback (English ONLY - after CMUdict fails)
-            if self.__lang == "en_US":
+            if self.__lang == "en":
                 syllable_count = regex_syllable_count(word)
                 for ending, adjust in SPECIES_NAME_ADJUSTMENTS.items():
                     if word.endswith(ending):

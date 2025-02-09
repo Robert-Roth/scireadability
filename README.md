@@ -90,7 +90,7 @@ The language will be used for syllable calculation and to choose
 variant of the formula. 
 
 ### Language variants
-All functions implement `en_US` language. Some of them has also variants 
+All functions implement `en` language. Some of them has also variants 
 for other languages listed below. 
 
 |  Function                   | en | de | es | fr | it | nl | pl | ru |

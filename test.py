@@ -244,7 +244,7 @@ hard_arabic_text = (
 
 
 def test_char_count():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.char_count(long_test)
     count_spaces = textstatsci.char_count(
         long_test, ignore_spaces=False
@@ -255,7 +255,7 @@ def test_char_count():
 
 
 def test_letter_count():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.letter_count(long_test)
     count_spaces = textstatsci.letter_count(
         long_test, ignore_spaces=False
@@ -266,7 +266,7 @@ def test_letter_count():
 
 
 def test_remove_punctuation_incl_apostrophe():
-    textstatsci.set_lang('en_US')
+    textstatsci.set_lang('en')
     textstatsci.set_rm_apostrophe(True)
     text = textstatsci.remove_punctuation(punct_text)
 
@@ -277,7 +277,7 @@ def test_remove_punctuation_incl_apostrophe():
 
 
 def test_remove_punctuation_excl_apostrophe():
-    textstatsci.set_lang('en_US')
+    textstatsci.set_lang('en')
     textstatsci.set_rm_apostrophe(False)
     text = textstatsci.remove_punctuation(punct_text)
 
@@ -285,7 +285,7 @@ def test_remove_punctuation_excl_apostrophe():
 
 
 def test_lexicon_count():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.lexicon_count(long_test)
     count_punc = textstatsci.lexicon_count(long_test, removepunct=False)
 
@@ -296,33 +296,33 @@ def test_lexicon_count():
 @pytest.mark.parametrize(
     "lang,text,n_syllables,margin",
     [
-        ("en_US", short_test, 7, 0),
-        ("en_US", punct_text, 74, 2),
-        ("en_US", "faeries", 2, 1),
-        ("en_US", "relived", 2, 0),
-        ("en_US", "couple", 2, 0),
-        ("en_US", "enriched", 2, 0),
-        ("en_US", "us", 1, 0),
-        ("en_US", "too", 1, 0),
-        ("en_US", "monopoly", 4, 0),
-        ("en_US", "him", 1, 0),
-        ("en_US", "he", 1, 0),
-        ("en_US", "without", 2, 0),
-        ("en_US", "creative", 3, 0),
-        ("en_US", "every", 3, 0),
-        ("en_US", "stimulating", 4, 0),
-        ("en_US", "life", 1, 0),
-        ("en_US", "cupboards", 2, 0),
-        ("en_US", "day's", 1, 0),
-        ("en_US", "forgotten", 3, 0),
-        ("en_US", "through", 1, 0),
-        ("en_US", "marriage", 2, 0),
-        ("en_US", "hello", 2, 0),
-        ("en_US", "the", 1, 0),
-        ("en_US", "sentences", 3, 0),
-        ("en_US", "songwriter", 3, 0),
-        ("en_US", "removing", 3, 0),
-        ("en_US", "interpersonal", 5, 0),
+        ("en", short_test, 7, 0),
+        ("en", punct_text, 74, 2),
+        ("en", "faeries", 2, 1),
+        ("en", "relived", 2, 0),
+        ("en", "couple", 2, 0),
+        ("en", "enriched", 2, 0),
+        ("en", "us", 1, 0),
+        ("en", "too", 1, 0),
+        ("en", "monopoly", 4, 0),
+        ("en", "him", 1, 0),
+        ("en", "he", 1, 0),
+        ("en", "without", 2, 0),
+        ("en", "creative", 3, 0),
+        ("en", "every", 3, 0),
+        ("en", "stimulating", 4, 0),
+        ("en", "life", 1, 0),
+        ("en", "cupboards", 2, 0),
+        ("en", "day's", 1, 0),
+        ("en", "forgotten", 3, 0),
+        ("en", "through", 1, 0),
+        ("en", "marriage", 2, 0),
+        ("en", "hello", 2, 0),
+        ("en", "the", 1, 0),
+        ("en", "sentences", 3, 0),
+        ("en", "songwriter", 3, 0),
+        ("en", "removing", 3, 0),
+        ("en", "interpersonal", 5, 0),
     ]
 )
 def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
@@ -334,7 +334,7 @@ def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
 
 
 def test_sentence_count():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.sentence_count(long_test)
 
     assert count == 17
@@ -348,35 +348,35 @@ def test_sentence_count_russian():
 
 
 def test_avg_sentence_length():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     avg = textstatsci.avg_sentence_length(long_test)
 
     assert avg == 21.88235294117647
 
 
 def test_avg_syllables_per_word():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     avg = textstatsci.avg_syllables_per_word(long_test)
 
     assert avg == 1.4758064516129032
 
 
 def test_avg_letter_per_word():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     avg = textstatsci.avg_letter_per_word(long_test)
 
     assert avg == 4.532258064516129
 
 
 def test_avg_sentence_per_word():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     avg = textstatsci.avg_sentence_per_word(long_test)
 
     assert avg == 0.0456989247311828
 
 
 def test_flesch_reading_ease():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.flesch_reading_ease(long_test)
 
     assert score == 59.77118595825428
@@ -413,42 +413,42 @@ def test_flesch_reading_ease():
 
 
 def test_flesch_kincaid_grade():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.flesch_kincaid_grade(long_test)
 
     assert score == 10.358633776091082
 
 
 def test_polysyllabcount():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.polysyllabcount(long_test)
 
     assert count == 38
 
 
 def test_smog_index():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     index = textstatsci.smog_index(long_test)
 
     assert index == 11.670169846198839
 
 
 def test_coleman_liau_index():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     index = textstatsci.coleman_liau_index(long_test)
 
     assert index == 9.13440860215054
 
 
 def test_automated_readability_index():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     index = textstatsci.automated_readability_index(long_test)
 
     assert index == 11.643111954459208
 
 
 def test_linsear_write_formula():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     result = textstatsci.linsear_write_formula(long_test)
 
     assert result == 15.25
@@ -459,35 +459,35 @@ def test_linsear_write_formula():
 
 
 def test_difficult_words():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     result = textstatsci.difficult_words(long_test)
 
     assert result == 54
 
 
 def test_difficult_words_list():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     result = textstatsci.difficult_words_list(short_test)
 
     assert result == ["sunglasses"]
 
 
 def test_is_difficult_word():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     result = textstatsci.is_difficult_word(difficult_word)
 
     assert result is True
 
 
 def test_is_easy_word():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     result = textstatsci.is_easy_word(easy_word)
 
     assert result is True
 
 
 def test_dale_chall_readability_score():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.dale_chall_readability_score(long_test)
 
     assert score == 7.7779937381404185
@@ -498,7 +498,7 @@ def test_dale_chall_readability_score():
 
 
 def test_gunning_fog():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.gunning_fog(long_test)
 
     assert score == 11.118532574320051
@@ -511,7 +511,7 @@ def test_gunning_fog():
 
 
 def test_lix():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.lix(long_test)
 
     assert score == 43.69086357947434
@@ -522,14 +522,14 @@ def test_lix():
 
 
 def test_rix():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.rix(long_test)
 
     assert score == 4.588235294117647
 
 
 def test_text_standard():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     standard = textstatsci.text_standard(long_test)
 
     assert standard == "10th and 11th grade"
@@ -540,14 +540,14 @@ def test_text_standard():
 
 
 def test_reading_time():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.reading_time(long_test)
 
     assert score == 25.67812
 
 
 def test_lru_caching():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     # Clear any cache
     textstatsci.sentence_count.cache_clear()
     textstatsci.avg_sentence_length.cache_clear()
@@ -567,7 +567,7 @@ def test_lru_caching():
 
 
 def test_changing_lang_clears_cache():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
 
     # Clear any cache and call reading ease
     textstatsci.flesch_reading_ease.cache_clear()
@@ -585,7 +585,7 @@ def test_changing_lang_clears_cache():
 
 
 def test_unicode_support():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     textstatsci.text_standard(
         "\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059")
 
@@ -593,7 +593,7 @@ def test_unicode_support():
 
 
 def test_spache_readability():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     spache = textstatsci.spache_readability(easy_text, False)
 
     assert spache == 2
@@ -604,7 +604,7 @@ def test_spache_readability():
 
 
 def test_dale_chall_readability_score_v2():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.dale_chall_readability_score_v2(long_test)
 
     assert score == 7.013961480075902
@@ -678,7 +678,7 @@ def test_gulpease_index():
 
 
 def test_default_lang_configs():
-    # Config from default en_US should be used
+    # Config from default en should be used
     textstatsci.set_lang("en_GB")
     score = textstatsci.flesch_reading_ease(long_test)
 
@@ -694,7 +694,7 @@ def test_osman():
 
 
 def test_disabling_rounding():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     textstatsci.set_rounding(False)
 
     index = textstatsci.spache_readability(long_test)
@@ -705,7 +705,7 @@ def test_disabling_rounding():
 
 
 def test_changing_rounding_points():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     textstatsci.set_rounding(True, points=5)
 
     index = textstatsci.spache_readability(long_test)
@@ -716,7 +716,7 @@ def test_changing_rounding_points():
 
 
 def test_instanced_textstat_rounding():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
 
     from textstatsci.textstatsci import textstatistics
 
@@ -733,14 +733,14 @@ def test_instanced_textstat_rounding():
 
 
 def test_mcalpine_eflaw():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     score = textstatsci.mcalpine_eflaw(long_test)
 
     assert score == 30.8
 
 
 def test_miniword_count():
-    textstatsci.set_lang("en_US")
+    textstatsci.set_lang("en")
     count = textstatsci.miniword_count(long_test)
 
     assert count == 151
