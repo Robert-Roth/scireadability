@@ -2,13 +2,13 @@ from setuptools import setup
 from io import open
 
 setup(
-    name="textstat",
-    packages=["textstat"],
-    version="0.7.5",
-    description="Calculate statistical features from text",
-    author="Shivam Bansal, Chaitanya Aggarwal",
-    author_email="shivam5992@gmail.com",
-    url="https://github.com/textstat/textstat",
+    name="textstatsci",
+    packages=["textstatsci"],
+    version="0.5.0",
+    description="Calculate statistical features from text, mainly scientific literature",
+    author="Shivam Bansal, Chaitanya Aggarwal, Robert Roth",
+    author_email="rwroth5@gmail.com",
+    url="https://github.com/robert-roth/textstatsci",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     package_data={"": ["easy_word_list"]},

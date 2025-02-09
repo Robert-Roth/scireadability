@@ -1,7 +1,6 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Textstat
+name: textstatsci
 
 on:
   push:
@@ -33,7 +32,7 @@ jobs:
 
       - name: Check code spelling
         run: |
-          pipenv run codespell -L paket --skip=./textstat/resources/**/easy_words.txt,./build/*,./textstat.egg-info/*,./.git/* --exclude-file=.codespellignorelines
+          pipenv run codespell -L paket --skip=./textstatsci/resources/**/easy_words.txt,./build/*,./textstatsci.egg-info/*,./.git/* --exclude-file=.codespellignorelines
 
       - name: Lint with flake8
         run: |

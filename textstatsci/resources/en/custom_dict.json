@@ -1,0 +1,25 @@
+{
+  "CUSTOM_SYLLABLE_DICT": {
+    "bioinformatics": 6,
+    "queueing": 2,
+    "liliopsida": 5,
+    "bacteriophage": 5,
+    "mycobacterium": 6,
+    "ophioglossum": 5,
+    "acai": 3,
+    "anemone": 4,
+    "autoimmune": 4,
+    "fuchsia": 2,
+    "electrophysiology": 8,
+    "allele": 2,
+    "biofilm": 3,
+    "biogeography": 6,
+    "bioremediation": 7,
+    "crispr": 2,
+    "macroevolution": 6,
+    "mendelian": 4,
+    "microrna": 5,
+    "pcr": 3,
+    "pleiotropy": 4
+  }
+}

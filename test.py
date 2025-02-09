@@ -1,11 +1,53 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 
-"""Test suite for textstat
-"""
+"""Test suite for textstatsci"""
 
-import textstat
+import json
+import os
+import shutil
+from textstatsci import dictionary_utils
+import textstatsci
 import pytest
+
+
+# --- Fixture for setup and teardown ---
+@pytest.fixture(scope="function")
+def test_env():
+    """Fixture to set up test environment (temp dirs, mocks) and teardown."""
+    test_config_dir = os.path.join(os.getcwd(), "test_config_dir")
+    test_resources_dir = os.path.join(os.getcwd(), "test_resources_dir")
+    os.makedirs(test_config_dir, exist_ok=True)
+    os.makedirs(test_resources_dir, exist_ok=True)
+
+    # --- Create necessary directories for default dictionaries within test_resources_dir ---
+    default_dict_en_dir = os.path.join(test_resources_dir, "resources", "en") # Path to en default dict dir
+    os.makedirs(default_dict_en_dir, exist_ok=True) # Create it
+
+    original_user_config_dir = dictionary_utils.user_config_dir
+    original_resource_string = dictionary_utils.pkg_resources.resource_string
+    dictionary_utils.user_config_dir = lambda package_name: test_config_dir
+    dictionary_utils.pkg_resources.resource_string = lambda package_name, resource_path: _mock_resource_string(test_resources_dir, resource_path)
+
+    yield test_config_dir, test_resources_dir
+
+    # --- Teardown ---
+    dictionary_utils.user_config_dir = original_user_config_dir
+    dictionary_utils.pkg_resources.resource_string = original_resource_string
+    if os.path.exists(test_config_dir):
+        shutil.rmtree(test_config_dir)
+    if os.path.exists(test_resources_dir):
+        shutil.rmtree(test_resources_dir)
+
+
+def _mock_resource_string(test_resources_dir, resource_path):
+    """Mock for pkg_resources.resource_string to use test resources."""
+    full_resource_path = os.path.join(test_resources_dir, resource_path)
+    if not os.path.exists(full_resource_path):
+        raise FileNotFoundError(f"Resource not found: {full_resource_path}")
+    with open(full_resource_path, 'r', encoding='utf-8') as f:
+        return f.read().encode('utf-8')
+
 
 short_test = "Cool dogs wear da sunglasses."
 
@@ -202,9 +244,9 @@ hard_arabic_text = (
 
 
 def test_char_count():
-    textstat.set_lang("en_US")
-    count = textstat.char_count(long_test)
-    count_spaces = textstat.char_count(
+    textstatsci.set_lang("en_US")
+    count = textstatsci.char_count(long_test)
+    count_spaces = textstatsci.char_count(
         long_test, ignore_spaces=False
     )
 
@@ -213,39 +255,39 @@ def test_char_count():
 
 
 def test_letter_count():
-    textstat.set_lang("en_US")
-    count = textstat.letter_count(long_test)
-    count_spaces = textstat.letter_count(
+    textstatsci.set_lang("en_US")
+    count = textstatsci.letter_count(long_test)
+    count_spaces = textstatsci.letter_count(
         long_test, ignore_spaces=False
     )
 
     assert count == 1686
-    assert count_spaces == 2061
+    assert count_spaces == 2063
 
 
 def test_remove_punctuation_incl_apostrophe():
-    textstat.set_lang('en_US')
-    textstat.set_rm_apostrophe(True)
-    text = textstat.remove_punctuation(punct_text)
+    textstatsci.set_lang('en_US')
+    textstatsci.set_rm_apostrophe(True)
+    text = textstatsci.remove_punctuation(punct_text)
 
     # set the __rm_apostrophe attribute back to the default
-    textstat.set_rm_apostrophe(False)
+    textstatsci.set_rm_apostrophe(False)
 
     assert text == punct_text_result_wo_apostr
 
 
 def test_remove_punctuation_excl_apostrophe():
-    textstat.set_lang('en_US')
-    textstat.set_rm_apostrophe(False)
-    text = textstat.remove_punctuation(punct_text)
+    textstatsci.set_lang('en_US')
+    textstatsci.set_rm_apostrophe(False)
+    text = textstatsci.remove_punctuation(punct_text)
 
     assert text == punct_text_result_w_apostr
 
 
 def test_lexicon_count():
-    textstat.set_lang("en_US")
-    count = textstat.lexicon_count(long_test)
-    count_punc = textstat.lexicon_count(long_test, removepunct=False)
+    textstatsci.set_lang("en_US")
+    count = textstatsci.lexicon_count(long_test)
+    count_punc = textstatsci.lexicon_count(long_test, removepunct=False)
 
     assert count == 372
     assert count_punc == 376
@@ -284,399 +326,399 @@ def test_lexicon_count():
     ]
 )
 def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
-    textstat.set_lang(lang)
-    count = textstat.syllable_count(text)
+    textstatsci.set_lang(lang)
+    count = textstatsci.syllable_count(text)
     diff = abs(count - n_syllables)
 
     assert diff <= margin
 
 
 def test_sentence_count():
-    textstat.set_lang("en_US")
-    count = textstat.sentence_count(long_test)
+    textstatsci.set_lang("en_US")
+    count = textstatsci.sentence_count(long_test)
 
     assert count == 17
 
 
 def test_sentence_count_russian():
-    textstat.set_lang('ru_RU')
-    count = textstat.sentence_count(long_russian_text_guillemets)
+    textstatsci.set_lang('ru_RU')
+    count = textstatsci.sentence_count(long_russian_text_guillemets)
 
     assert count == 16
 
 
 def test_avg_sentence_length():
-    textstat.set_lang("en_US")
-    avg = textstat.avg_sentence_length(long_test)
+    textstatsci.set_lang("en_US")
+    avg = textstatsci.avg_sentence_length(long_test)
 
-    assert avg == 21.9
+    assert avg == 21.88235294117647
 
 
 def test_avg_syllables_per_word():
-    textstat.set_lang("en_US")
-    avg = textstat.avg_syllables_per_word(long_test)
+    textstatsci.set_lang("en_US")
+    avg = textstatsci.avg_syllables_per_word(long_test)
 
-    assert avg == 1.5
+    assert avg == 1.4758064516129032
 
 
 def test_avg_letter_per_word():
-    textstat.set_lang("en_US")
-    avg = textstat.avg_letter_per_word(long_test)
+    textstatsci.set_lang("en_US")
+    avg = textstatsci.avg_letter_per_word(long_test)
 
-    assert avg == 4.53
+    assert avg == 4.532258064516129
 
 
 def test_avg_sentence_per_word():
-    textstat.set_lang("en_US")
-    avg = textstat.avg_sentence_per_word(long_test)
+    textstatsci.set_lang("en_US")
+    avg = textstatsci.avg_sentence_per_word(long_test)
 
-    assert avg == 0.05
+    assert avg == 0.0456989247311828
 
 
 def test_flesch_reading_ease():
-    textstat.set_lang("en_US")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 57.71
+    assert score == 59.77118595825428
 
-    textstat.set_lang("de_DE")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("de_DE")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 64.5
+    assert score == 66.27893738140419
 
-    textstat.set_lang("es_ES")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("es_ES")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 86.76
+    assert score == 86.77806451612905
 
-    textstat.set_lang("fr_FR")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("fr_FR")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 81.73
+    assert score == 82.30339025932953
 
-    textstat.set_lang("it_IT")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("it_IT")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 91.57
+    assert score == 91.61745730550285
 
-    textstat.set_lang("nl_NL")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("nl_NL")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 63.27
+    assert score == 66.01666982922202
 
-    textstat.set_lang("ru_RU")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("ru_RU")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 118.27
+    assert score == 118.28794117647061
 
 
 def test_flesch_kincaid_grade():
-    textstat.set_lang("en_US")
-    score = textstat.flesch_kincaid_grade(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.flesch_kincaid_grade(long_test)
 
-    assert score == 10.7
+    assert score == 10.358633776091082
 
 
 def test_polysyllabcount():
-    textstat.set_lang("en_US")
-    count = textstat.polysyllabcount(long_test)
+    textstatsci.set_lang("en_US")
+    count = textstatsci.polysyllabcount(long_test)
 
     assert count == 38
 
 
 def test_smog_index():
-    textstat.set_lang("en_US")
-    index = textstat.smog_index(long_test)
+    textstatsci.set_lang("en_US")
+    index = textstatsci.smog_index(long_test)
 
-    assert index == 11.7
+    assert index == 11.670169846198839
 
 
 def test_coleman_liau_index():
-    textstat.set_lang("en_US")
-    index = textstat.coleman_liau_index(long_test)
+    textstatsci.set_lang("en_US")
+    index = textstatsci.coleman_liau_index(long_test)
 
-    assert index == 8.99
+    assert index == 9.13440860215054
 
 
 def test_automated_readability_index():
-    textstat.set_lang("en_US")
-    index = textstat.automated_readability_index(long_test)
+    textstatsci.set_lang("en_US")
+    index = textstatsci.automated_readability_index(long_test)
 
-    assert index == 11.6
+    assert index == 11.643111954459208
 
 
 def test_linsear_write_formula():
-    textstat.set_lang("en_US")
-    result = textstat.linsear_write_formula(long_test)
+    textstatsci.set_lang("en_US")
+    result = textstatsci.linsear_write_formula(long_test)
 
     assert result == 15.25
 
-    result = textstat.linsear_write_formula(empty_str)
+    result = textstatsci.linsear_write_formula(empty_str)
 
     assert result == -1.0
 
 
 def test_difficult_words():
-    textstat.set_lang("en_US")
-    result = textstat.difficult_words(long_test)
+    textstatsci.set_lang("en_US")
+    result = textstatsci.difficult_words(long_test)
 
     assert result == 54
 
 
 def test_difficult_words_list():
-    textstat.set_lang("en_US")
-    result = textstat.difficult_words_list(short_test)
+    textstatsci.set_lang("en_US")
+    result = textstatsci.difficult_words_list(short_test)
 
     assert result == ["sunglasses"]
 
 
 def test_is_difficult_word():
-    textstat.set_lang("en_US")
-    result = textstat.is_difficult_word(difficult_word)
+    textstatsci.set_lang("en_US")
+    result = textstatsci.is_difficult_word(difficult_word)
 
     assert result is True
 
 
 def test_is_easy_word():
-    textstat.set_lang("en_US")
-    result = textstat.is_easy_word(easy_word)
+    textstatsci.set_lang("en_US")
+    result = textstatsci.is_easy_word(easy_word)
 
     assert result is True
 
 
 def test_dale_chall_readability_score():
-    textstat.set_lang("en_US")
-    score = textstat.dale_chall_readability_score(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.dale_chall_readability_score(long_test)
 
-    assert score == 7.78
+    assert score == 7.7779937381404185
 
-    score = textstat.dale_chall_readability_score(empty_str)
+    score = textstatsci.dale_chall_readability_score(empty_str)
 
     assert score == 0.0
 
 
 def test_gunning_fog():
-    textstat.set_lang("en_US")
-    score = textstat.gunning_fog(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.gunning_fog(long_test)
 
-    assert score == 11.13
+    assert score == 11.118532574320051
 
     # FOG-PL
-    textstat.set_lang("pl_PL")
-    score_pl = textstat.gunning_fog(long_test)
+    textstatsci.set_lang("pl_PL")
+    score_pl = textstatsci.gunning_fog(long_test)
 
-    assert score_pl == 9.84
+    assert score_pl == 9.82820999367489
 
 
 def test_lix():
-    textstat.set_lang("en_US")
-    score = textstat.lix(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.lix(long_test)
 
-    assert score == 43.71
+    assert score == 43.69086357947434
 
-    result = textstat.lix(empty_str)
+    result = textstatsci.lix(empty_str)
 
     assert result == 0.0
 
 
 def test_rix():
-    textstat.set_lang("en_US")
-    score = textstat.rix(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.rix(long_test)
 
-    assert score == 4.59
+    assert score == 4.588235294117647
 
 
 def test_text_standard():
-    textstat.set_lang("en_US")
-    standard = textstat.text_standard(long_test)
+    textstatsci.set_lang("en_US")
+    standard = textstatsci.text_standard(long_test)
 
-    assert standard == "11th and 12th grade"
+    assert standard == "10th and 11th grade"
 
-    standard = textstat.text_standard(short_test)
+    standard = textstatsci.text_standard(short_test)
 
-    assert standard == "2nd and 3rd grade"
+    assert standard == "1st and 2nd grade"
 
 
 def test_reading_time():
-    textstat.set_lang("en_US")
-    score = textstat.reading_time(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.reading_time(long_test)
 
-    assert score == 25.68
+    assert score == 25.67812
 
 
 def test_lru_caching():
-    textstat.set_lang("en_US")
+    textstatsci.set_lang("en_US")
     # Clear any cache
-    textstat.sentence_count.cache_clear()
-    textstat.avg_sentence_length.cache_clear()
+    textstatsci.sentence_count.cache_clear()
+    textstatsci.avg_sentence_length.cache_clear()
 
     # Make a call that uses `sentence_count`
-    textstat.avg_sentence_length(long_test)
+    textstatsci.avg_sentence_length(long_test)
 
     # Test that `sentence_count` was called
-    assert textstat.sentence_count.cache_info().misses == 1
+    assert textstatsci.sentence_count.cache_info().misses == 1
 
     # Call `avg_sentence_length` again, but clear it's cache first
-    textstat.avg_sentence_length.cache_clear()
-    textstat.avg_sentence_length(long_test)
+    textstatsci.avg_sentence_length.cache_clear()
+    textstatsci.avg_sentence_length(long_test)
 
     # Test that `sentence_count` wasn't called again
-    assert textstat.sentence_count.cache_info().hits == 1
+    assert textstatsci.sentence_count.cache_info().hits == 1
 
 
 def test_changing_lang_clears_cache():
-    textstat.set_lang("en_US")
+    textstatsci.set_lang("en_US")
 
     # Clear any cache and call reading ease
-    textstat.flesch_reading_ease.cache_clear()
-    textstat.flesch_reading_ease(short_test)
+    textstatsci.flesch_reading_ease.cache_clear()
+    textstatsci.flesch_reading_ease(short_test)
 
     # Check the cache has only been missed once
-    assert textstat.flesch_reading_ease.cache_info().misses == 1
+    assert textstatsci.flesch_reading_ease.cache_info().misses == 1
 
     # Change the language and recall reading ease
-    textstat.set_lang("fr")
-    textstat.flesch_reading_ease(short_test)
+    textstatsci.set_lang("fr")
+    textstatsci.flesch_reading_ease(short_test)
 
     # Check the cache hasn't been hit again
-    assert textstat.flesch_reading_ease.cache_info().misses == 1
+    assert textstatsci.flesch_reading_ease.cache_info().misses == 1
 
 
 def test_unicode_support():
-    textstat.set_lang("en_US")
-    textstat.text_standard(
+    textstatsci.set_lang("en_US")
+    textstatsci.text_standard(
         "\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059")
 
-    textstat.text_standard("ありがとうございます")
+    textstatsci.text_standard("ありがとうございます")
 
 
 def test_spache_readability():
-    textstat.set_lang("en_US")
-    spache = textstat.spache_readability(easy_text, False)
+    textstatsci.set_lang("en_US")
+    spache = textstatsci.spache_readability(easy_text, False)
 
     assert spache == 2
 
-    score = textstat.spache_readability(empty_str)
+    score = textstatsci.spache_readability(empty_str)
 
     assert score == 0.0
 
 
 def test_dale_chall_readability_score_v2():
-    textstat.set_lang("en_US")
-    score = textstat.dale_chall_readability_score_v2(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.dale_chall_readability_score_v2(long_test)
 
-    assert score == 7.01
+    assert score == 7.013961480075902
 
 
 def test_fernandez_huerta():
-    textstat.set_lang("es")
-    score = textstat.fernandez_huerta(long_spanish_text)
+    textstatsci.set_lang("es")
+    score = textstatsci.fernandez_huerta(long_spanish_text)
 
-    assert score == 65.3
+    assert score == 65.96666666666667
 
-    score = textstat.fernandez_huerta(empty_str)
+    score = textstatsci.fernandez_huerta(empty_str)
 
     assert score == 206.84
 
 
 def test_szigriszt_pazos():
-    textstat.set_lang("es")
-    score = textstat.szigriszt_pazos(long_spanish_text)
+    textstatsci.set_lang("es")
+    score = textstatsci.szigriszt_pazos(long_spanish_text)
 
-    assert score == 62.16
+    assert score == 62.16222222222224
 
-    score = textstat.szigriszt_pazos(empty_str)
+    score = textstatsci.szigriszt_pazos(empty_str)
 
     assert score == 0.0
 
 
 def test_gutierrez_polini():
-    textstat.set_lang("es")
-    score = textstat.gutierrez_polini(easy_spanish_text)
+    textstatsci.set_lang("es")
+    score = textstatsci.gutierrez_polini(easy_spanish_text)
 
-    assert score == 64.35
+    assert score == 64.35000000000001
 
-    score = textstat.gutierrez_polini(empty_str)
+    score = textstatsci.gutierrez_polini(empty_str)
 
     assert score == 0.0
 
 
 def test_crawford():
-    textstat.set_lang("es")
-    score = textstat.crawford(long_spanish_text)
+    textstatsci.set_lang("es")
+    score = textstatsci.crawford(long_spanish_text)
 
-    assert score == 5.1
+    assert score == 5.089296296296297
 
-    score = textstat.crawford(empty_str)
+    score = textstatsci.crawford(empty_str)
 
     assert score == 0.0
 
 
 def test_wienersachtext_formula():
-    textstat.set_lang("de")
+    textstatsci.set_lang("de")
     sample_text = 'Alle meine Entchen schwimmen auf dem See, \
     Köpfchen unters Wasser, Schwänzchen in die Höh.'
-    wstf = textstat.wiener_sachtextformel(sample_text, variant=1)
+    wstf = textstatsci.wiener_sachtextformel(sample_text, variant=1)
 
     assert wstf == 3.8
 
     sample_text = 'Alle Parteien widmen dem Thema rein quantitativ \
     betrachtet nennenswerte Aufmerksamkeit, die Grünen wenig überraschend \
     am meisten.'
-    wstf = textstat.wiener_sachtextformel(sample_text, variant=1)
+    wstf = textstatsci.wiener_sachtextformel(sample_text, variant=1)
 
     assert wstf == 13.9
 
 
 def test_gulpease_index():
-    textstat.set_lang("it")
-    score = textstat.gulpease_index(italian_text)
+    textstatsci.set_lang("it")
+    score = textstatsci.gulpease_index(italian_text)
 
-    assert score == 40.1
+    assert score == 40.111111111111114
 
 
 def test_default_lang_configs():
     # Config from default en_US should be used
-    textstat.set_lang("en_GB")
-    score = textstat.flesch_reading_ease(long_test)
+    textstatsci.set_lang("en_GB")
+    score = textstatsci.flesch_reading_ease(long_test)
 
-    assert score == 66.17
+    assert score == 70.23247628083493
 
 
 def test_osman():
-    easy_score = textstat.osman(easy_arabic_text)
-    hard_score = textstat.osman(hard_arabic_text)
+    easy_score = textstatsci.osman(easy_arabic_text)
+    hard_score = textstatsci.osman(hard_arabic_text)
 
-    assert easy_score == 102.19
-    assert hard_score == 39.29
+    assert easy_score == 102.18627777777778
+    assert hard_score == 39.292019999999994
 
 
 def test_disabling_rounding():
-    textstat.set_lang("en_US")
-    textstat.set_rounding(False)
+    textstatsci.set_lang("en_US")
+    textstatsci.set_rounding(False)
 
-    index = textstat.spache_readability(long_test)
+    index = textstatsci.spache_readability(long_test)
 
-    textstat.set_rounding(True)
+    textstatsci.set_rounding(True)
 
     assert index == 5.172798861480075
 
 
 def test_changing_rounding_points():
-    textstat.set_lang("en_US")
-    textstat.set_rounding(True, points=5)
+    textstatsci.set_lang("en_US")
+    textstatsci.set_rounding(True, points=5)
 
-    index = textstat.spache_readability(long_test)
+    index = textstatsci.spache_readability(long_test)
 
-    textstat.set_rounding(True)
+    textstatsci.set_rounding(True)
 
     assert index == 5.1728
 
 
 def test_instanced_textstat_rounding():
-    textstat.set_lang("en_US")
+    textstatsci.set_lang("en_US")
 
-    from textstat.textstat import textstatistics
+    from textstatsci.textstatsci import textstatistics
 
     my_textstat = textstatistics()
     my_textstat.set_rounding(False)
@@ -685,21 +727,21 @@ def test_instanced_textstat_rounding():
 
     assert my_not_rounded_index == 5.172798861480075
 
-    default_rounded_index = textstat.spache_readability(long_test)
+    default_rounded_index = textstatsci.spache_readability(long_test)
 
     assert default_rounded_index == 5.17
 
 
 def test_mcalpine_eflaw():
-    textstat.set_lang("en_US")
-    score = textstat.mcalpine_eflaw(long_test)
+    textstatsci.set_lang("en_US")
+    score = textstatsci.mcalpine_eflaw(long_test)
 
     assert score == 30.8
 
 
 def test_miniword_count():
-    textstat.set_lang("en_US")
-    count = textstat.miniword_count(long_test)
+    textstatsci.set_lang("en_US")
+    count = textstatsci.miniword_count(long_test)
 
     assert count == 151
 
@@ -723,7 +765,7 @@ hard_hungarian_text = (
     kevert gyümölcs levek, melyek sűrűn folyó, hideg, fagylaltszerű
     italkülönlegességet eredményeztek.
     """
-    )
+)
 
 hard_academic_hungarian_text = (
     """
@@ -748,13 +790,13 @@ hard_academic_hungarian_text = (
 
 def test_char_count_hungarian():
     # Arrange
-    textstat.set_lang("hu_HU")
+    textstatsci.set_lang("hu_HU")
     expected_easy_count = 43
     expected_easy_count_spaces = 54
 
     # Act
-    actual_count = textstat.char_count(easy_hungarian_text)
-    actual_count_spaces = textstat.char_count(
+    actual_count = textstatsci.char_count(easy_hungarian_text)
+    actual_count_spaces = textstatsci.char_count(
         easy_hungarian_text, ignore_spaces=False
     )
 
@@ -765,12 +807,12 @@ def test_char_count_hungarian():
 
 def test_letter_count_hungarian():
     # Arrange
-    textstat.set_lang("hu_HU")
+    textstatsci.set_lang("hu_HU")
     expected_easy_count = 42
     expected_easy_count_spaces = 53
 
-    actual_count = textstat.letter_count(easy_hungarian_text)
-    actual_count_spaces = textstat.letter_count(
+    actual_count = textstatsci.letter_count(easy_hungarian_text)
+    actual_count_spaces = textstatsci.letter_count(
         easy_hungarian_text, ignore_spaces=False
     )
 
@@ -781,13 +823,13 @@ def test_letter_count_hungarian():
 
 def test_sentence_count_hungarian():
     # Arrange
-    textstat.set_lang('hu_HU')
+    textstatsci.set_lang('hu_HU')
     expected_hard = 3
     expected_hard_academic = 6
 
     # Act
-    actual_hard = textstat.sentence_count(hard_hungarian_text)
-    actual_academic = textstat.sentence_count(hard_academic_hungarian_text)
+    actual_hard = textstatsci.sentence_count(hard_hungarian_text)
+    actual_academic = textstatsci.sentence_count(hard_academic_hungarian_text)
 
     # Assert
     assert actual_hard == expected_hard
@@ -796,15 +838,15 @@ def test_sentence_count_hungarian():
 
 def test_flesch_reading_ease_hungarian():
     # Arrange
-    textstat.set_lang("hu_HU")
+    textstatsci.set_lang("hu_HU")
     expected_easy = 89.09
     expected_hard = 53.0
     expected_hard_academic = 22.02
 
     # Act
-    actual_easy = textstat.flesch_reading_ease(easy_hungarian_text2)
-    actual_hard = textstat.flesch_reading_ease(hard_hungarian_text)
-    actual_academic = textstat.flesch_reading_ease(
+    actual_easy = textstatsci.flesch_reading_ease(easy_hungarian_text2)
+    actual_hard = textstatsci.flesch_reading_ease(hard_hungarian_text)
+    actual_academic = textstatsci.flesch_reading_ease(
         hard_academic_hungarian_text
     )
 
@@ -816,15 +858,15 @@ def test_flesch_reading_ease_hungarian():
 
 def test_smog_index_hungarian():
     # Arrange
-    textstat.set_lang("hu_HU")
+    textstatsci.set_lang("hu_HU")
     expected_easy = 0
     expected_hard = 17.9
     expected_hard_academic = 21.9
 
     # Act
-    actual_easy = textstat.smog_index(easy_hungarian_text)
-    actual_hard = textstat.smog_index(hard_hungarian_text)
-    actual_academic = textstat.smog_index(hard_academic_hungarian_text)
+    actual_easy = textstatsci.smog_index(easy_hungarian_text)
+    actual_hard = textstatsci.smog_index(hard_hungarian_text)
+    actual_academic = textstatsci.smog_index(hard_academic_hungarian_text)
 
     # Assert
     assert actual_easy == expected_easy
@@ -834,17 +876,374 @@ def test_smog_index_hungarian():
 
 def test_gunning_fog_hungarian():
     # Arrange
-    textstat.set_lang("hu_HU")
+    textstatsci.set_lang("hu_HU")
     expected_easy = 2.6
     expected_hard = 9.71
     expected_hard_academic = 14.41
 
     # Act
-    actual_easy = textstat.gunning_fog(easy_hungarian_text2)
-    actual_hard = textstat.gunning_fog(hard_hungarian_text)
-    actual_academic = textstat.gunning_fog(hard_academic_hungarian_text)
+    actual_easy = textstatsci.gunning_fog(easy_hungarian_text2)
+    actual_hard = textstatsci.gunning_fog(hard_hungarian_text)
+    actual_academic = textstatsci.gunning_fog(hard_academic_hungarian_text)
 
     # Assert
     assert actual_easy == expected_easy
     assert actual_hard == expected_hard
     assert actual_academic == expected_hard_academic
+
+# --- Tests for load_custom_syllable_dict ---
+def test_load_custom_syllable_dict_user_dict_exists_valid_json(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    user_dict_content = {"CUSTOM_SYLLABLE_DICT": {"testword": 3}}
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
+    with open(user_dict_path, 'w', encoding='utf-8') as f:
+        json.dump(user_dict_content, f)
+
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == user_dict_content["CUSTOM_SYLLABLE_DICT"]
+
+
+def test_load_custom_syllable_dict_user_dict_not_exists_default_exists_valid(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump(default_dict_content, f)
+
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"]
+
+
+def test_load_custom_syllable_dict_user_dict_not_exists_default_not_exists(test_env):
+    lang = "en"
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == {}
+
+
+def test_load_custom_syllable_dict_user_dict_not_exists_default_exists_invalid_json(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    # No need to create dirs here, fixture does it now
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        f.write("invalid json")
+
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == {}
+
+
+# --- Tests for overwrite_custom_dict ---
+def test_overwrite_custom_dict_valid_json_file(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    new_dict_content = {"CUSTOM_SYLLABLE_DICT": {"newword": 4, "anotherword": 5}}
+    test_json_file = os.path.join(test_config_dir, "test_dict.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(new_dict_content, f)
+
+    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+
+    assert loaded_dict == new_dict_content["CUSTOM_SYLLABLE_DICT"]
+
+
+def test_overwrite_custom_dict_file_not_found(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    non_existent_file = os.path.join(test_config_dir, "nonexistent.json")
+    with pytest.raises(FileNotFoundError):
+        dictionary_utils.overwrite_custom_dict(non_existent_file, lang)
+
+
+def test_overwrite_custom_dict_invalid_json_file(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    invalid_json_file = os.path.join(test_config_dir, "invalid.json")
+    with open(invalid_json_file, 'w', encoding='utf-8') as f:
+        f.write("invalid json")
+
+    with pytest.raises(json.JSONDecodeError):
+        dictionary_utils.overwrite_custom_dict(invalid_json_file, lang)
+
+
+def test_overwrite_custom_dict_invalid_dict_format(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    invalid_format_file = os.path.join(test_config_dir, "badformat.json")
+    bad_format_content = {"WRONG_KEY": {"word": 1}}
+    with open(invalid_format_file, 'w', encoding='utf-8') as f:
+        json.dump(bad_format_content, f)
+
+    with pytest.raises(ValueError):
+        dictionary_utils.overwrite_custom_dict(invalid_format_file, lang)
+
+
+# --- Tests for add_term_to_custom_dict ---
+def test_add_term_to_custom_dict_valid_term(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    word_to_add = "testterm"
+    syllable_count = 4
+
+    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count, lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+
+    assert word_to_add in loaded_dict
+    assert loaded_dict[word_to_add] == syllable_count
+
+
+def test_add_term_to_custom_dict_invalid_syllable_count_zero(test_env):
+    lang = "en"
+    with pytest.raises(ValueError):
+        dictionary_utils.add_term_to_custom_dict("word", 0, lang)
+
+
+def test_add_term_to_custom_dict_invalid_syllable_count_negative(test_env):
+    lang = "en"
+    with pytest.raises(ValueError):
+        dictionary_utils.add_term_to_custom_dict("word", -1, lang)
+
+
+def test_add_term_to_custom_dict_invalid_syllable_count_not_int(test_env):
+    lang = "en"
+    with pytest.raises(ValueError):
+        dictionary_utils.add_term_to_custom_dict("word", "not_an_int", lang)
+
+
+# --- Tests for add_terms_from_file ---
+def test_add_terms_from_file_valid_json_file(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    new_terms_content = {"CUSTOM_SYLLABLE_DICT": {"fileword1": 2, "fileword2": 3}}
+    test_json_file = os.path.join(test_config_dir, "terms.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(new_terms_content, f)
+
+    dictionary_utils.add_terms_from_file(test_json_file, lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+
+    for word, count in new_terms_content["CUSTOM_SYLLABLE_DICT"].items():
+        assert word in loaded_dict
+        assert loaded_dict[word] == count
+
+
+def test_add_terms_from_file_file_not_found(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    non_existent_file = os.path.join(test_config_dir, "nonexistent_terms.json")
+    with pytest.raises(FileNotFoundError):
+        dictionary_utils.add_terms_from_file(non_existent_file, lang)
+
+
+def test_add_terms_from_file_invalid_json_file(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    invalid_json_file = os.path.join(test_config_dir, "invalid_terms.json")
+    with open(invalid_json_file, 'w', encoding='utf-8') as f:
+        f.write("invalid json")
+
+    with pytest.raises(json.JSONDecodeError):
+        dictionary_utils.add_terms_from_file(invalid_json_file, lang)
+
+
+def test_add_terms_from_file_invalid_dict_format(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    invalid_format_file = os.path.join(test_config_dir, "badformat_terms.json")
+    bad_format_content = {"WRONG_KEY": {"word": 1}}
+    with open(invalid_format_file, 'w', encoding='utf-8') as f:
+        json.dump(bad_format_content, f)
+
+    with pytest.raises(ValueError):
+        dictionary_utils.add_terms_from_file(invalid_format_file, lang)
+
+
+# --- Tests for revert_custom_dict_to_default ---
+def test_revert_custom_dict_to_default_user_dict_exists(test_env):
+    test_config_dir, test_resources_dir = test_env
+    lang = "en"
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
+    with open(user_dict_path, 'w', encoding='utf-8') as f:
+        json.dump({"CUSTOM_SYLLABLE_DICT": {"userword": 100}}, f)
+
+    default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    # No need to create dirs here, fixture does it now
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump(default_dict_content, f)
+
+    dictionary_utils.revert_custom_dict_to_default(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+
+    assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"]
+
+
+def test_revert_custom_dict_to_default_default_dict_not_found(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_file = os.path.join(test_resources_dir, default_dict_path)
+    if os.path.exists(default_dict_file):
+        os.remove(default_dict_file)
+    os.makedirs(os.path.dirname(default_dict_file), exist_ok=True) # Ensure lang dir exists
+
+    with pytest.raises(FileNotFoundError):
+        dictionary_utils.revert_custom_dict_to_default(lang)
+
+
+def test_revert_custom_dict_to_default_invalid_json_in_default(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    # No need to create dirs here, fixture does it now
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        f.write("invalid json")
+
+    with pytest.raises(json.JSONDecodeError):
+        dictionary_utils.revert_custom_dict_to_default(lang)
+
+def test_load_custom_syllable_dict_case_sensitivity(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"TestWord": 2}} # Mixed case in default
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump(default_dict_content, f)
+
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert "testword" in loaded_dict # Assert lowercase lookup works (case-insensitive loading is assumed)
+    assert loaded_dict["testword"] == 2 # Check correct count
+
+
+def test_load_custom_syllable_dict_empty_default_dict_file(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump({}, f) # Empty JSON as default
+
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == {} # Should load as empty dict
+
+
+# --- Additional Tests for overwrite_custom_dict ---
+def test_overwrite_custom_dict_large_json_file(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    large_dict_content = {"CUSTOM_SYLLABLE_DICT": {f"word_{i}": i % 5 + 1 for i in range(1000)}}
+    test_json_file = os.path.join(test_config_dir, "large_dict.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(large_dict_content, f)
+
+    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == large_dict_content["CUSTOM_SYLLABLE_DICT"] # Verify content
+
+
+def test_overwrite_custom_dict_verify_file_content(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    new_dict_content = {"CUSTOM_SYLLABLE_DICT": {"filecheckword": 3}}
+    test_json_file = os.path.join(test_config_dir, "temp_dict.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(new_dict_content, f)
+
+    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    with open(user_dict_path, 'r', encoding='utf-8') as f:
+        file_dict_content = json.load(f)
+    assert file_dict_content == new_dict_content # Verify file content directly
+
+
+# --- Additional Tests for add_term_to_custom_dict ---
+def test_add_term_to_custom_dict_existing_term_same_count(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    word_to_add = "existingword"
+    syllable_count = 2
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
+    with open(user_dict_path, 'w', encoding='utf-8') as f:
+        json.dump({"CUSTOM_SYLLABLE_DICT": {word_to_add: syllable_count}}, f) # Dict exists with word
+
+    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count, lang) # Add again with same count
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict[word_to_add] == syllable_count # Count should remain the same
+
+def test_add_term_to_custom_dict_existing_term_different_count(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    word_to_add = "existingword"
+    initial_syllable_count = 2
+    new_syllable_count = 3
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
+    with open(user_dict_path, 'w', encoding='utf-8') as f:
+        json.dump({"CUSTOM_SYLLABLE_DICT": {word_to_add: initial_syllable_count}}, f) # Dict exists with word
+
+    dictionary_utils.add_term_to_custom_dict(word_to_add, new_syllable_count, lang) # Add again with different count
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict[word_to_add] == new_syllable_count # Count should be updated/overwritten
+
+
+# --- Additional Tests for add_terms_from_file ---
+def test_add_terms_from_file_empty_custom_syllable_dict_key(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    empty_dict_file_content = {"CUSTOM_SYLLABLE_DICT": {}} # Empty dict for the key
+    test_json_file = os.path.join(test_config_dir, "empty_dict_terms.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(empty_dict_file_content, f)
+
+    dictionary_utils.add_terms_from_file(test_json_file, lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == {} # Should remain or become empty
+
+
+def test_add_terms_from_file_non_dict_value_for_custom_syllable_dict(test_env):
+    test_config_dir, _ = test_env
+    lang = "en"
+    non_dict_file_content = {"CUSTOM_SYLLABLE_DICT": ["not", "a", "dict"]} # List instead of dict
+    test_json_file = os.path.join(test_config_dir, "non_dict_terms.json")
+    with open(test_json_file, 'w', encoding='utf-8') as f:
+        json.dump(non_dict_file_content, f)
+
+    with pytest.raises(ValueError):
+        dictionary_utils.add_terms_from_file(test_json_file, lang)
+
+
+# --- Additional Tests for revert_custom_dict_to_default ---
+def test_revert_custom_dict_to_default_no_user_dict_exists(test_env):
+    test_config_dir, test_resources_dir = test_env
+    lang = "en"
+    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    if os.path.exists(user_dict_path): # Ensure no user dict exists before test
+        os.remove(user_dict_path)
+    user_dict_dir = os.path.dirname(user_dict_path)
+    if os.path.exists(user_dict_dir) and not os.listdir(user_dict_dir):
+        os.rmdir(user_dict_dir) # Remove user lang dir if empty
+
+    default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump(default_dict_content, f)
+
+    dictionary_utils.revert_custom_dict_to_default(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"] # Should create user dict from default
+
+
+def test_revert_custom_dict_to_default_empty_default_dict(test_env):
+    _, test_resources_dir = test_env
+    lang = "en"
+    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
+        json.dump({}, f) # Empty default dictionary
+
+    dictionary_utils.revert_custom_dict_to_default(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    assert loaded_dict == {} # Should revert to empty dict

@@ -1,13 +1,21 @@
-import warnings
-import re
 import math
+import re
+import warnings
 from collections import Counter
-from typing import Union, List, Set
-
-import pkg_resources
 from functools import lru_cache
+from typing import List, Set, Union
 from pyphen import Pyphen
+from .dictionary_utils import (
+    load_custom_syllable_dict,
+    overwrite_custom_dict,
+    add_term_to_custom_dict,
+    add_terms_from_file,
+    print_custom_dict,
+    revert_custom_dict_to_default
+)
+
 import cmudict
+import pkg_resources
 
 langs = {
     "en": {  # Default config
@@ -61,6 +69,45 @@ langs = {
     }
 }
 
+VOWEL_RUNS = re.compile("[aeiouy]+", flags=re.I)
+
+EXCEPTIONS = re.compile(
+    "[^aeiou]e[sd]?$|"
+    + "[^e]ely$",
+    flags=re.I
+)
+
+ADDITIONAL = re.compile(
+    r"[^aeioulr][lr]e[sd]?$|[csgz]es$|[td]ed$|"
+    + r".y[aeiou]|ia(?!n$)|eo|ism$|[^aeiou]ire$|[^gq]ua|"
+    + r"[^aeiouy][bcdfgjklmnpqrstvwxyz]le$|"
+    + r"ian$|"
+    + r"^bio",
+    flags=re.I
+)
+
+
+def regex_syllable_count(word):
+    """
+    Improved regex syllable counter for general and science words.
+    Credit to hauntsaninja's answer (base regex) here.
+    https://datascience.stackexchange.com/a/89312
+
+    Refinements have been made which bump up accuracy (measured against cmudict) to 90.23%)
+    """
+    vowel_runs = len(VOWEL_RUNS.findall(word))
+    exceptions = len(EXCEPTIONS.findall(word))
+    additional = len(ADDITIONAL.findall(word))
+    return max(1, vowel_runs - exceptions + additional)
+
+
+SPECIES_NAME_ADJUSTMENTS = {
+    "ii": 1,
+    "odes": 1,
+    "eae": 1,
+    "oides": 1,
+}
+
 
 def get_grade_suffix(grade: int) -> str:
     """
@@ -72,7 +119,7 @@ def get_grade_suffix(grade: int) -> str:
 
 
 class textstatistics:
-    """Main textstat class with methods to calculate readability indices.
+    """Main textstatsci class with methods to calculate readability indices.
 
     Attributes
     ----------
@@ -81,21 +128,27 @@ class textstatistics:
     __lang : str
         Default : "en_US"
     __round_outputs : bool
-        Whether to round floating point outputs. Default: True
+        Whether to round floating point outputs. Default: False
     __round_points : int or None
         The number of decimals to use when rounding outputs. round_points will
         override any argument passed to the _legacy_round method. If
         round_points is set to None, the number of decimals will be determined
         by the argument passed to the method. Default: None
     __rm_apostrophe : bool
+        If True, all textstatsci methods that use the remove_punctuataion
+        function for the word count, syllable count or character count,
+        remove the apostrophe in contractions along with other punctuation.
+        If False, punctuation is removed with the exception of apostrophes
+        in common English contractions. Default: False
     """
 
     __lang = "en_US"
     __easy_word_sets = {}
-    __round_outputs = True
+    __round_outputs = False
     __round_points = None
-    __rm_apostrophe = True
+    __rm_apostrophe = False
     text_encoding = "utf-8"
+    custom_dict = load_custom_syllable_dict()
 
     def __init__(self):
         self.set_lang(self.__lang)
@@ -104,11 +157,39 @@ class textstatistics:
         caching_methods = [
             method for method in dir(self)
             if callable(getattr(self, method))
-            and hasattr(getattr(self, method), "cache_info")
+               and hasattr(getattr(self, method), "cache_info")
         ]
 
         for method in caching_methods:
             getattr(self, method).cache_clear()
+
+    def set_custom_dict_language(self, lang="en"):
+        """Sets the language for the custom dictionary."""
+        self.custom_dict = load_custom_syllable_dict(lang)
+        self.__lang = lang  # Optionally update language setting of your class
+
+    def overwrite_dictionary(self, file_path, lang="en"):
+        """API to overwrite the custom dictionary."""
+        overwrite_custom_dict(file_path, lang)
+        self.custom_dict = load_custom_syllable_dict(lang)  # Reload dictionary
+
+    def add_word_to_dictionary(self, word, syllable_count, lang="en"):
+        """API to add a single word to the custom dictionary."""
+        add_term_to_custom_dict(word, syllable_count, lang)
+        self.custom_dict = load_custom_syllable_dict(lang)  # Reload dictionary
+
+    def add_words_from_file_to_dictionary(self, file_path, lang="en"):
+        """API to add words from a file to the custom dictionary."""
+        add_terms_from_file(file_path, lang)
+        self.custom_dict = load_custom_syllable_dict(lang)
+
+    def revert_dictionary_to_default(self, lang="en_US"):
+        """API to revert the custom dictionary to the default."""
+        revert_custom_dict_to_default(lang)
+
+    def print_dictionary(self, lang="en"):
+        """API to print the custom dictionary."""
+        print_custom_dict(lang)
 
     def _legacy_round(self, number: float, points: int = 0) -> float:
         """Round `number`, unless the attribute `__round_outputs` is `False`.
@@ -131,7 +212,7 @@ class textstatistics:
 
         """
         points = self.__round_points if (
-            self.__round_points is not None) else points
+                self.__round_points is not None) else points
         if self.__round_outputs:
             p = 10 ** points
             return float(
@@ -140,16 +221,16 @@ class textstatistics:
             return number
 
     def set_rounding(
-        self, rounding: bool, points: Union[int, None] = None
+            self, rounding: bool, points: Union[int, None] = None
     ) -> None:
         """Set the attributes `__round_point` and `__round_outputs`.
 
         Parameters
         ----------
         rounding : bool
-            Whether to round the outputs of all textstat methods.
+            Whether to round the outputs of all textstatsci methods.
         points : int or None, optional
-            The number of decimal digits for the outputs of all textstat
+            The number of decimal digits for the outputs of all textstatsci
             methods. The default is None.
 
         Returns
@@ -166,7 +247,7 @@ class textstatistics:
         Parameters
         ----------
         rm_apostrophe : bool
-            If True, all textstat methods that use the remove_punctuataion
+            If True, all textstatsci methods that use the remove_punctuataion
             function for the word count, syllable count or character count,
             remove the apostrophe in contractions along with other punctuation.
             If False, punctuation is removed with the exception of apostrophes
@@ -180,26 +261,26 @@ class textstatistics:
         self.__rm_apostrophe = rm_apostrophe
 
     def set_lang(self, lang: str) -> None:
-        """Set the language of your text strings.
-
-        The default locale ID is 'en_US'.
-
-        Parameters
-        ----------
-        lang : str
-            A locale ID.
-
-        Returns
-        -------
-        None.
-
-        """
+        """Set the language and load appropriate resources."""
         self.__lang = lang
-        self.pyphen = Pyphen(lang=self.__lang)
         if lang == "en_US":
             self.cmu_dict = cmudict.dict()
         else:
-            self.cmu_dict = None
+            self.cmu_dict = None  # CMUdict only for English
+
+        # Only load Pyphen if NOT English
+        if lang != "en_US":
+            try:
+                self.pyphen = Pyphen(lang=self.__lang)
+            except pkg_resources.DistributionNotFound:
+                warnings.warn(
+                    f"Pyphen dictionary for '{lang}' not found. "
+                    "Syllable counts may be inaccurate for this language."
+                )
+                self.pyphen = None
+        else:
+            self.pyphen = None  # Explicitly set to None for English
+
         self._cache_clear()
 
     @lru_cache(maxsize=128)
@@ -330,7 +411,7 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def syllable_count(self, text: str, lang: Union[str, None] = None) -> int:
-        """Calculate syllable words in a text using cmudict and pyphen.
+        """Calculate syllable words in a text using custom dictionary, then cmudict, and pyphen.
 
         Parameters
         ----------
@@ -344,15 +425,11 @@ class textstatistics:
         Returns
         -------
         int
-            Number of syllables in `text`.
-        """
-        if lang:
-            warnings.warn(
-                "The 'lang' argument has been moved to "
-                "'textstat.set_lang(<lang>)'. This argument will be removed "
-                "in the future.",
-                DeprecationWarning
-            )
+            Number of syllables in `text`."""
+
+        if lang:  # Remove in future versions
+            warnings.warn("The 'lang' argument is deprecated.", DeprecationWarning)
+
         if isinstance(text, bytes):
             text = text.decode(self.text_encoding)
 
@@ -362,15 +439,42 @@ class textstatistics:
         if not text:
             return 0
 
-        count = 0
-        for word in text.split():
-            try:
-                cmu_phones = self.cmu_dict[word][0]
-                count += sum(1 for p in cmu_phones if p[-1].isdigit())
-            except (TypeError, IndexError):
-                count += len(self.pyphen.positions(word)) + 1
+        total_syllables = 0
 
-        return count
+        for word in text.split():
+
+            # 1. Custom dictionary
+            if word in self.custom_dict:
+                total_syllables += self.custom_dict[word]
+                continue  # Skip to the next word if found in custom_dict
+
+            # 2. Language-Specific Dictionaries
+            if self.__lang == "en_US":
+                # 2a. English: CMUdict
+                try:
+                    cmu_phones = self.cmu_dict[word][0]
+                    total_syllables += sum(1 for p in cmu_phones if p[-1].isdigit())
+                    continue  # Skip to next word if found in CMUdict
+                except (TypeError, IndexError, KeyError):
+                    pass  # CMUdict failed, move to regex (for English)
+
+            elif self.pyphen:
+                # 2b. Non-English: Pyphen (if available)
+                total_syllables += len(self.pyphen.positions(word)) + 1
+                continue  # Skip to next word if Pyphen used
+
+            # 3. Regex Fallback (English ONLY - after CMUdict fails)
+            if self.__lang == "en_US":
+                syllable_count = regex_syllable_count(word)
+                for ending, adjust in SPECIES_NAME_ADJUSTMENTS.items():
+                    if word.endswith(ending):
+                        syllable_count += adjust
+                        break
+                total_syllables += syllable_count
+
+            # No fallback for non-English if Pyphen is unavailable/fails.
+
+        return total_syllables
 
     @lru_cache(maxsize=128)
     def sentence_count(self, text: str) -> int:
@@ -420,7 +524,7 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def avg_syllables_per_word(
-        self, text: str, interval: Union[int, None] = None
+            self, text: str, interval: Union[int, None] = None
     ) -> float:
         """Get the average number of syllables per word.
 
@@ -608,7 +712,7 @@ class textstatistics:
                 # only if a character is a tashkeel, has a successor
                 # and is followed by an alef, waw or yaaA ...
                 if (i + 1 < len(char_list) and
-                        char_list[i+1] in ['\u0627', '\u0648', '\u064a']):
+                        char_list[i + 1] in ['\u0627', '\u0648', '\u064a']):
                     # ... increment long syllable count
                     long_count += 1
                 else:
@@ -690,15 +794,15 @@ class textstatistics:
         s_interval = 100 if self.__get_lang_root() in ["es", "it"] else None
 
         flesch = (
-            self.__get_lang_cfg("fre_base")
-            - float(
-                self.__get_lang_cfg("fre_sentence_length")
-                * self.avg_sentence_length(text)
-            )
-            - float(
-                self.__get_lang_cfg("fre_syll_per_word")
-                * self.avg_syllables_per_word(text, s_interval)
-            )
+                self.__get_lang_cfg("fre_base")
+                - float(
+            self.__get_lang_cfg("fre_sentence_length")
+            * self.avg_sentence_length(text)
+        )
+                - float(
+            self.__get_lang_cfg("fre_syll_per_word")
+            * self.avg_syllables_per_word(text, s_interval)
+        )
         )
         return self._legacy_round(flesch, 2)
 
@@ -938,8 +1042,8 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def difficult_words_list(
-                self, text: str, syllable_threshold: int = 2
-            ) -> List[str]:
+            self, text: str, syllable_threshold: int = 2
+    ) -> List[str]:
         """Get a list of difficult words
 
         Parameters
@@ -963,7 +1067,7 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def is_difficult_word(
-        self, word: str, syllable_threshold: int = 2
+            self, word: str, syllable_threshold: int = 2
     ) -> bool:
         """Return True if `word` is a difficult word.
 
@@ -1053,10 +1157,10 @@ class textstatistics:
         try:
             syllable_threshold = self.__get_lang_cfg("syllable_threshold")
             per_diff_words = (
-                self.difficult_words(
-                    text,
-                    syllable_threshold=syllable_threshold)
-                / self.lexicon_count(text) * 100)
+                    self.difficult_words(
+                        text,
+                        syllable_threshold=syllable_threshold)
+                    / self.lexicon_count(text) * 100)
 
             grade = 0.4 * (self.avg_sentence_length(text) + per_diff_words)
             return self._legacy_round(grade, 2)
@@ -1091,10 +1195,10 @@ class textstatistics:
 
         `A` is obtained with `len(text.split())`, which counts
         contractions as one word. `A/B` is
-        calculated using the method `textstat.avg_sentence_length()`, which
+        calculated using the method `textstatsci.avg_sentence_length()`, which
         counts contractions as two words, unless `__rm_apostrophe` is set to
         False. Therefore, the definition of a word is only consistent if you
-        call `textstat.set_rm_apostrophe(False)` before calculating the LIX.
+        call `textstatsci.set_rm_apostrophe(False)` before calculating the LIX.
 
         """
         words = text.split()
@@ -1140,7 +1244,7 @@ class textstatistics:
 
         Anderson (1983) specifies that punctuation should be removed and that
         hyphenated sequences and abbreviations count as single words.
-        Therefore, make sure to call `textstat.set_rm_apostrophe(False)` before
+        Therefore, make sure to call `textstatsci.set_rm_apostrophe(False)` before
         calculating the RIX.
 
         """
@@ -1157,7 +1261,7 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def spache_readability(
-        self, text: str, float_output: bool = True
+            self, text: str, float_output: bool = True
     ) -> Union[float, int]:
         """
         Function to calculate SPACHE readability formula for young readers.
@@ -1199,7 +1303,7 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def text_standard(
-        self, text: str, float_output: bool = None
+            self, text: str, float_output: bool = None
     ) -> Union[float, str]:
 
         grade = []
@@ -1212,20 +1316,20 @@ class textstatistics:
 
         # Appending Flesch Reading Easy
         score = self.flesch_reading_ease(text)
-        if score < 100 and score >= 90:
+        if 100 > score >= 90:
             grade.append(5)
-        elif score < 90 and score >= 80:
+        elif 90 > score >= 80:
             grade.append(6)
-        elif score < 80 and score >= 70:
+        elif 80 > score >= 70:
             grade.append(7)
-        elif score < 70 and score >= 60:
+        elif 70 > score >= 60:
             grade.append(8)
             grade.append(9)
-        elif score < 60 and score >= 50:
+        elif 60 > score >= 50:
             grade.append(10)
-        elif score < 50 and score >= 40:
+        elif 50 > score >= 40:
             grade.append(11)
-        elif score < 40 and score >= 30:
+        elif 40 > score >= 30:
             grade.append(12)
         else:
             grade.append(13)
@@ -1293,37 +1397,37 @@ class textstatistics:
         rt_per_word = map(lambda nchar: nchar * ms_per_char, nchars)
         reading_time = sum(list(rt_per_word))
 
-        return self._legacy_round(reading_time/1000, 2)
+        return self._legacy_round(reading_time / 1000, 2)
 
     # Spanish readability tests
     @lru_cache(maxsize=128)
     def fernandez_huerta(self, text: str) -> float:
-        '''
+        """
         Fernandez Huerta readability score
         https://legible.es/blog/lecturabilidad-fernandez-huerta/
-        '''
+        """
         sentence_length = self.avg_sentence_length(text)
         syllables_per_word = self.avg_syllables_per_word(text)
 
         f_huerta = (
-            206.84 - float(60 * syllables_per_word) -
-            float(1.02 * sentence_length))
+                206.84 - float(60 * syllables_per_word) -
+                float(1.02 * sentence_length))
         return self._legacy_round(f_huerta, 2)
 
     @lru_cache(maxsize=128)
     def szigriszt_pazos(self, text: str) -> float:
-        '''
+        """
         Szigriszt Pazos readability score (1992)
         https://legible.es/blog/perspicuidad-szigriszt-pazos/
-        '''
+        """
         syllables = self.syllable_count(text)
         total_words = self.lexicon_count(text)
         total_sentences = self.sentence_count(text)
         try:
             s_p = (
-                self.__get_lang_cfg("fre_base") -
-                62.3 * (syllables / total_words)
-                - (total_words / total_sentences)
+                    self.__get_lang_cfg("fre_base") -
+                    62.3 * (syllables / total_words)
+                    - (total_words / total_sentences)
             )
         except ZeroDivisionError:
             return 0.0
@@ -1331,18 +1435,18 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def gutierrez_polini(self, text: str) -> float:
-        '''
+        """
         Guttierrez de Polini index
         https://legible.es/blog/comprensibilidad-gutierrez-de-polini/
-        '''
+        """
         total_words = self.lexicon_count(text)
         total_letters = self.letter_count(text)
         total_sentences = self.sentence_count(text)
 
         try:
             gut_pol = (
-                95.2 - 9.7 * (total_letters / total_words)
-                - 0.35 * (total_words / total_sentences)
+                    95.2 - 9.7 * (total_letters / total_words)
+                    - 0.35 * (total_words / total_sentences)
             )
         except ZeroDivisionError:
             return 0.0
@@ -1350,10 +1454,10 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def crawford(self, text: str) -> float:
-        '''
+        """
         Crawford index
         https://legible.es/blog/formula-de-crawford/
-        '''
+        """
         total_sentences = self.sentence_count(text)
         total_words = self.lexicon_count(text)
         total_syllables = self.syllable_count(text)
@@ -1366,43 +1470,43 @@ class textstatistics:
             return 0.0
 
         craw_years = (
-            -0.205 * sentences_per_words
-            + 0.049 * syllables_per_words - 3.407
-            )
+                -0.205 * sentences_per_words
+                + 0.049 * syllables_per_words - 3.407
+        )
 
         return self._legacy_round(craw_years, 1)
 
     @lru_cache(maxsize=128)
     def osman(self, text: str) -> float:
-        '''
+        """
         Osman index for Arabic texts
         https://www.aclweb.org/anthology/L16-1038.pdf
-        '''
+        """
 
         if not len(text):
             return 0.0
 
         complex_word_rate = float(self.count_complex_arabic_words(text)) \
-            / self.lexicon_count(text)
+                            / self.lexicon_count(text)
         long_word_rate = float(self.count_arabic_long_words(text)) \
-            / self.lexicon_count(text)
+                         / self.lexicon_count(text)
         syllables_per_word = float(self.count_arabic_syllables(text)) \
-            / self.lexicon_count(text)
+                             / self.lexicon_count(text)
         faseeh_per_word = float(self.count_faseeh(text)) \
-            / self.lexicon_count(text)
+                          / self.lexicon_count(text)
 
         osman = 200.791 - (1.015 * self.words_per_sentence(text)) - \
-            (24.181 * (complex_word_rate + syllables_per_word
-                       + faseeh_per_word + long_word_rate))
+                (24.181 * (complex_word_rate + syllables_per_word
+                           + faseeh_per_word + long_word_rate))
 
         return self._legacy_round(osman, 2)
 
     @lru_cache(maxsize=128)
     def gulpease_index(self, text: str) -> float:
-        '''
+        """
         Indice Gulpease Index for Italian texts
         https://it.wikipedia.org/wiki/Indice_Gulpease
-        '''
+        """
 
         if len(text) < 1:
             return 0.0
@@ -1414,23 +1518,23 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def long_word_count(self, text: str) -> int:
-        ''' counts words with more than 6 characters '''
+        """ counts words with more than 6 characters """
         word_list = self.remove_punctuation(text).split()
         return len([w for w in word_list if len(w) > 6])
 
     @lru_cache(maxsize=128)
     def monosyllabcount(self, text: str) -> int:
-        ''' counts monosyllables '''
+        """ counts monosyllables """
         word_list = self.remove_punctuation(text).split()
         return len([w for w in word_list if self.syllable_count(w) < 2])
 
     @lru_cache(maxsize=128)
     def wiener_sachtextformel(self, text: str, variant: int) -> float:
-        '''
+        """
         Wiener Sachtextformel for readability assessment of German texts
 
         https://de.wikipedia.org/wiki/Lesbarkeitsindex#Wiener_Sachtextformel
-        '''
+        """
 
         if len(text) < 1:
             return 0.0
@@ -1444,7 +1548,7 @@ class textstatistics:
 
         if variant == 1:
             score = (0.1935 * ms) + (0.1672 * sl) \
-                + (0.1297 * iw) - (0.0327 * es) - 0.875
+                    + (0.1297 * iw) - (0.0327 * es) - 0.875
             return round(score, 1)
         elif variant == 2:
             score = (0.2007 * ms) + (0.1682 * sl) + (0.1373 * iw) - 2.779
@@ -1460,12 +1564,12 @@ class textstatistics:
 
     @lru_cache(maxsize=128)
     def mcalpine_eflaw(self, text: str) -> float:
-        '''
+        """
         McAlpine EFLAW score that asseses the readability of English texts
         for English foreign learners
 
         https://strainindex.wordpress.com/2009/04/30/mcalpine-eflaw-readability-score/
-        '''
+        """
 
         if len(text) < 1:
             return 0.0
@@ -1491,7 +1595,7 @@ class textstatistics:
                 easy_word_set = {
                     ln.decode("utf-8").strip()
                     for ln in pkg_resources.resource_stream(
-                        "textstat",
+                        "textstatsci",
                         f"resources/{lang}/easy_words.txt",
                     )
                 }
@@ -1504,11 +1608,11 @@ class textstatistics:
                 easy_word_set = {
                     ln.decode("utf-8").strip()
                     for ln in pkg_resources.resource_stream(
-                        "textstat", "resources/en/easy_words.txt"
+                        "textstatsci", "resources/en/easy_words.txt"
                     )
                 }
             self.__easy_word_sets[lang] = easy_word_set
         return self.__easy_word_sets[lang]
 
 
-textstat = textstatistics()
+textstatsci = textstatistics()

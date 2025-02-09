@@ -1,104 +1,93 @@
-# Textstat
+# textstatsci
+### Textual statistics for science communication
 
-[![PyPI](https://img.shields.io/pypi/v/textstat.svg)](https://pypi.org/project/textstat/)
-[![Build Status](https://github.com/shivam5992/textstat/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/shivam5992/textstat/actions/workflows/test.yml)
-[![Downloads](https://img.shields.io/badge/dynamic/json.svg?url=https://pypistats.org/api/packages/textstat/recent?mirrors=false&label=downloads&query=$.data.last_month&suffix=/month)](https://pypistats.org/packages/textstat)
+>`textstatsci` is a fork of the [textstat](https://github.com/shivam5992/textstat) Python library, originally created by Shivam Bansal and Chaitanya Aggarwal.  It builds upon textstat to provide improved text statistics for scientific and academic texts, particularly in handling specialized vocabulary like species names.
 
-**Textstat is an easy to use library to calculate statistics from text. It helps determine readability, complexity, and grade level.**
+> Modifications include a built-in custom dictionary (and the ability to use your own) and improved handling for specialized vocabulary.
 
-<p align="center">
-  <img width="100%" src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&h=400&q=80">
-</p>
-<p align="right">
-  <sup>Photo by <a href="https://unsplash.com/@impatrickt">Patrick Tomasso</a>
-  on <a href="https://unsplash.com/images/things/book">Unsplash</a></sup>
-</p>
+**textstatsci is an easy-to-use library to calculate statistics from text. It helps determine readability, complexity, and grade level. It is specialized for scientific texts, but can be applied to non-scientific texts as well. However, it is possible that the enhancements made with scientific texts in mind could impact accuracy of non-scientific texts.**
 
 ## Usage
 
 ```python
->>> import textstat
+>>> import textstatsci
 
 >>> test_data = (
-    "Playing games has always been thought to be important to "
-    "the development of well-balanced and creative children; "
-    "however, what part, if any, they should play in the lives "
-    "of adults has never been researched that deeply. I believe "
-    "that playing games is every bit as important for adults "
-    "as for children. Not only is taking time out to play games "
-    "with our children and other adults valuable to building "
-    "interpersonal relationships but is also a wonderful way "
-    "to release built up tension."
+    "Within the heterogeneous canopy of the Amazonian rainforest, a fascinating interspecies interaction manifests "
+    "between Cephalotes atratus, a species of arboreal ant, and Epiphytes dendrobii, a genus of epiphytic orchids.  "
+    "Observations reveal that C. atratus colonies cultivate E. dendrobii within their carton nests, providing a "
+    "nitrogen-rich substrate derived from ant detritus.  In return, the orchids, exhibiting a CAM photosynthetic "
+    "pathway adapted to the shaded understory, contribute to nest structural integrity through their root systems and "
+    "potentially volatile organic compounds.  This interaction exemplifies a form of facultative mutualism, where both "
+    "species derive benefits, yet neither exhibits obligate dependence for survival in situ. Further investigation into "
+    "the biochemical signaling involved in this symbiosis promises to elucidate novel ecological strategies."
 )
 
->>> textstat.flesch_reading_ease(test_data)
->>> textstat.flesch_kincaid_grade(test_data)
->>> textstat.smog_index(test_data)
->>> textstat.coleman_liau_index(test_data)
->>> textstat.automated_readability_index(test_data)
->>> textstat.dale_chall_readability_score(test_data)
->>> textstat.difficult_words(test_data)
->>> textstat.linsear_write_formula(test_data)
->>> textstat.gunning_fog(test_data)
->>> textstat.text_standard(test_data)
->>> textstat.fernandez_huerta(test_data)
->>> textstat.szigriszt_pazos(test_data)
->>> textstat.gutierrez_polini(test_data)
->>> textstat.crawford(test_data)
->>> textstat.gulpease_index(test_data)
->>> textstat.osman(test_data)
+>>> textstatsci.flesch_reading_ease(test_data)
+>>> textstatsci.flesch_kincaid_grade(test_data)
+>>> textstatsci.smog_index(test_data)
+>>> textstatsci.coleman_liau_index(test_data)
+>>> textstatsci.automated_readability_index(test_data)
+>>> textstatsci.dale_chall_readability_score(test_data)
+>>> textstatsci.difficult_words(test_data)
+>>> textstatsci.linsear_write_formula(test_data)
+>>> textstatsci.gunning_fog(test_data)
+>>> textstatsci.text_standard(test_data)
+>>> textstatsci.fernandez_huerta(test_data)
+>>> textstatsci.szigriszt_pazos(test_data)
+>>> textstatsci.gutierrez_polini(test_data)
+>>> textstatsci.crawford(test_data)
+>>> textstatsci.gulpease_index(test_data)
+>>> textstatsci.osman(test_data)
 ```
 
-The argument (text) for all the defined functions remains the same -
+The argument (text) for all the defined functions remains the same —
 i.e the text for which statistics need to be calculated.
 
 ## Install
 
-You can install textstat either via the Python Package Index (PyPI) or from source.
+You can install textstatsci either via the Python Package Index (PyPI) or from source.
 
 ### Install using pip
 
 ```shell
-pip install textstat
-```
-
-### Install using easy_install
-
-```shell
-easy_install textstat
+pip install textstatsci
 ```
 
 ### Install latest version from GitHub
 
 ```shell
-git clone https://github.com/textstat/textstat.git
-cd textstat
+git clone https://github.com/robert-roth/textstatsci.git
+cd textstatsci
 pip install .
 ```
 
 ### Install from PyPI
 
-Download the latest version of textstat from http://pypi.python.org/pypi/textstat/
+Download the latest version of textstatsci from http://pypi.python.org/pypi/textstatsci/
 
 You can install it by doing the following:
 
 ```shell
-tar xfz textstat-*.tar.gz
-cd textstat-*/
+tar xfz textstatsci-*.tar.gz
+cd textstatsci-*/
 python setup.py build
 python setup.py install # as root
 ```
 
 ## Language support
-By default functions implement algorithms for english language. 
+By default functions implement algorithms for English language. 
+>Note that accuracy may suffer for non-English scientific texts. The custom dictionary and 
+> syllable counter fallbacks are based on pronunciations in American English.
+
 To change language, use:
 
 ```python
-textstat.set_lang(lang)
+textstatsci.set_lang(lang)
 ``` 
 
 The language will be used for syllable calculation and to choose 
-variant of the formula.
+variant of the formula. 
 
 ### Language variants
 All functions implement `en_US` language. Some of them has also variants 
@@ -110,18 +99,63 @@ for other languages listed below.
 | gunning_fog                 | ✔  |    |    |    |    |    | ✔  |    |
 
 #### Spanish-specific tests
-The following functions are specifically designed for spanish language.
-They can be used on non-spanish texts, even though that use case is not recommended.
+The following functions are specifically designed for Spanish language.
+They can be used on non-Spanish texts, even though that use case is not recommended.
 
 ```python
->>> textstat.fernandez_huerta(test_data)
->>> textstat.szigriszt_pazos(test_data)
->>> textstat.gutierrez_polini(test_data)
->>> textstat.crawford(test_data)
+>>> textstatsci.fernandez_huerta(test_data)
+>>> textstatsci.szigriszt_pazos(test_data)
+>>> textstatsci.gutierrez_polini(test_data)
+>>> textstatsci.crawford(test_data)
 ```
 
 Additional information on the formula they implement can be found in their respective docstrings.
 
+### Custom Syllable Dictionary
+
+Textstatsci allows you to customize the syllable counts for words that might be miscounted by the default algorithm or to add counts for words not present in the base dictionaries. This is particularly useful for:
+
+*   **Handling exceptions:** Correcting syllable counts for words that are exceptions to general syllabification rules (e.g., proper nouns, different pronunciations).
+*   **Adding specialized vocabulary:** Including syllable counts for terms specific to your domain or field that might not be in standard dictionaries, such as species names and drug names.
+*   **Improving accuracy:** Fine-tuning syllable counts to enhance the precision of readability scores and other text statistics.
+
+**Managing Your Custom Dictionary**
+
+Textstatsci comes prebundled with a custom dictionary (`resources/en/custom_dict.json`) that is loaded with some words that are poorly handled by syllable counters. Textstatsci also provides utilities to manage your custom syllable dictionary. These dictionaries are stored as JSON files in your user configuration directory (the location of which depends on your operating system, but is typically within your user profile under a directory named `.textstatsci` or similar).
+
+The dictionary uses the following functions to interact with the custom dictionary:
+
+*   **`load_custom_syllable_dict(lang="en")`**:  Loads the currently active custom syllable dictionary for the specified language (default is English - "en"). This function prioritizes a user-defined dictionary if it exists, falling back to the default dictionary provided with the package if no user dictionary is found. The loaded dictionary is case-insensitive for word lookups.
+
+*   **`overwrite_custom_dict(file_path, lang="en")`**: Replaces your entire custom dictionary for the given language with the contents of a JSON file you provide at `file_path`. The JSON file must be formatted correctly (see "Dictionary file format" below).
+
+*   **`add_term_to_custom_dict(word, syllable_count, lang="en")`**: Adds a single `word` with a specified `syllable_count` to your custom dictionary. If the `word` already exists, its syllable count will be updated to the new value.
+
+*   **`add_terms_from_file(file_path, lang="en")`**:  Allows you to add multiple terms to your custom dictionary from a JSON file at `file_path`. The JSON file should contain a dictionary of words and their syllable counts under the `"CUSTOM_SYLLABLE_DICT"` key (see "Dictionary file format" below).
+
+*   **`revert_custom_dict_to_default(lang="en")`**: Resets your custom dictionary for the specified language back to the original default dictionary that comes with textstatsci. This effectively removes all your custom word additions and overrides.
+
+*   **`print_custom_dict(lang="en")`**: Prints the contents of your currently loaded custom dictionary to the console in a readable JSON format. Useful for inspecting the dictionary's contents.
+
+**Dictionary file format**
+
+Custom dictionary files (used with `overwrite_custom_dict` and `add_terms_from_file`) must be valid JSON files with the following structure:
+
+```json
+{
+  "CUSTOM_SYLLABLE_DICT": {
+    "word1": syllable_count1,
+    "word2": syllable_count2,
+    "anotherword": 4,
+    "...": "..."
+  }
+}
+```
+#### Schema:
+
+- The top-level JSON object must contain a key named "CUSTOM_SYLLABLE_DICT".
+- The value associated with "CUSTOM_SYLLABLE_DICT" must be a JSON object (dictionary).
+- Within this dictionary, keys are words (strings), and values are their corresponding syllable counts (integers).
 ## List of Functions
 
 ### Formulas
@@ -129,7 +163,7 @@ Additional information on the formula they implement can be found in their respe
 #### The Flesch Reading Ease formula
 
 ```python
-textstat.flesch_reading_ease(text)
+textstatsci.flesch_reading_ease(text)
 ```
 
 Returns the Flesch Reading Ease Score.
@@ -157,7 +191,7 @@ the score can be. A negative score is valid.
 #### The Flesch-Kincaid Grade Level
 
 ```python
-textstat.flesch_kincaid_grade(text)
+textstatsci.flesch_kincaid_grade(text)
 ```
 
 Returns the Flesch-Kincaid Grade of the given text. This is a grade
@@ -170,7 +204,7 @@ read the document.
 #### The Fog Scale (Gunning FOG Formula)
 
 ```python
-textstat.gunning_fog(text)
+textstatsci.gunning_fog(text)
 ```
 
 Returns the FOG index of the given text. This is a grade formula in that
@@ -182,14 +216,14 @@ a score of 9.3 means that a ninth grader would be able to read the document.
 #### The SMOG Index
 
 ```python
-textstat.smog_index(text)
+textstatsci.smog_index(text)
 ```
 
 Returns the SMOG index of the given text. This is a grade formula in that
 a score of 9.3 means that a ninth grader would be able to read the document.
 
 Texts of fewer than 30 sentences are statistically invalid, because
-the SMOG formula was normed on 30-sentence samples. textstat requires at
+the SMOG formula was normed on 30-sentence samples. textstatsci requires at
 least 3 sentences for a result.
 
 > Further reading on
@@ -198,7 +232,7 @@ least 3 sentences for a result.
 #### Automated Readability Index
 
 ```python
-textstat.automated_readability_index(text)
+textstatsci.automated_readability_index(text)
 ```
 
 Returns the ARI (Automated Readability Index) which outputs
@@ -214,7 +248,7 @@ the text is 6th to 7th grade.
 #### The Coleman-Liau Index
 
 ```python
-textstat.coleman_liau_index(text)
+textstatsci.coleman_liau_index(text)
 ```
 
 Returns the grade level of the text using the Coleman-Liau Formula. This is
@@ -227,7 +261,7 @@ able to read the document.
 #### Linsear Write Formula
 
 ```python
-textstat.linsear_write_formula(text)
+textstatsci.linsear_write_formula(text)
 ```
 
 Returns the grade level using the Linsear Write Formula. This is
@@ -240,7 +274,7 @@ able to read the document.
 #### Dale-Chall Readability Score
 
 ```python
-textstat.dale_chall_readability_score(text)
+textstatsci.dale_chall_readability_score(text)
 ```
 
 Different from other tests, since it uses a lookup table
@@ -262,7 +296,7 @@ the grade level using the New Dale-Chall Formula.
 #### Readability Consensus based upon all the above tests
 
 ```python
-textstat.text_standard(text, float_output=False)
+textstatsci.text_standard(text, float_output=False)
 ```
 
 Based upon all the above tests, returns the estimated school
@@ -274,7 +308,7 @@ Optional `float_output` allows the score to be returned as a
 #### Spache Readability Formula
 
 ```python
-textstat.spache_readability(text)
+textstatsci.spache_readability(text)
 ```
 
 Returns grade level of english text.
@@ -287,7 +321,7 @@ Intended for text written for children up to grade four.
 #### McAlpine EFLAW Readability Score
 
 ```python
-textstat.mcalpine_eflaw(text)
+textstatsci.mcalpine_eflaw(text)
 ```
 
 Returns a score for the readability of an english text for a foreign learner or
@@ -301,7 +335,7 @@ It is recommended to aim for a score equal to or lower than 25.
 #### Reading Time
 
 ```python
-textstat.reading_time(text, ms_per_char=14.69)
+textstatsci.reading_time(text, ms_per_char=14.69)
 ```
 
 Returns the reading time of the given text.
@@ -315,7 +349,7 @@ Assumes 14.69ms per character.
 #### Índice de lecturabilidad Fernandez-Huerta (Spanish)  
 
 ```python
-textstat.fernandez_huerta(text)
+textstatsci.fernandez_huerta(text)
 ```
 
 Reformulation of the Flesch Reading Ease Formula specifically for spanish.
@@ -327,7 +361,7 @@ The results can be interpreted similarly
 #### Índice de perspicuidad de Szigriszt-Pazos (Spanish)  
 
 ```python
-textstat.szigriszt_pazos(text)
+textstatsci.szigriszt_pazos(text)
 ```
 Adaptation of Flesch Reading Ease formula for spanish-based texts.
 
@@ -339,7 +373,7 @@ Attempts to quantify how understandable a text is.
 #### Fórmula de comprensibilidad de Gutiérrez de Polini (Spanish)  
 
 ```python
-textstat.gutierrez_polini(text)
+textstatsci.gutierrez_polini(text)
 ```
 
 Returns the Guttiérrez de Polini understandability index.
@@ -355,7 +389,7 @@ Scores for more complex text are not reliable.
 #### Fórmula de Crawford (Spanish)  
 
 ```python
-textstat.crawford(text)
+textstatsci.crawford(text)
 ```
 
 Returns the Crawford score for the text.
@@ -370,7 +404,7 @@ The text is only valid for elementary school level texts.
 #### Osman (Arabic)
 
 ```python
-textstat.osman(text)
+textstatsci.osman(text)
 ```
 
 Returns OSMAN score for text.
@@ -384,7 +418,7 @@ Introduces a new factor called "Faseeh".
 #### Gulpease Index (Italian)
 
 ```python
-textstat.gulpease_index(text)
+textstatsci.gulpease_index(text)
 ```
 
 Returns the Gulpease index of Italian text, which translates to 
@@ -398,7 +432,7 @@ Lower scores require higher level of education to read with ease.
 #### Wiener Sachtextformel (German)
 
 ```python
-textstat.wiener_sachtextformel(text, variant)
+textstatsci.wiener_sachtextformel(text, variant)
 ```
 
 Returns a grade level score for the given text.
@@ -413,20 +447,22 @@ A value of 4 means very easy text, whereas 15 means very difficult text.
 #### Syllable Count
 
 ```python
-textstat.syllable_count(text)
+textstatsci.syllable_count(text)
 ```
 
 Returns the number of syllables present in the given text.
+All syllable counts first check the custom dictionary, then, in English, uses [cmudit](https://github.com/prosegrinder/python-cmudict).
+For words not in cmudict, a regex-based counter (which agrees with cmudict ~91% of the time)
+is used. The regex is a refined version of hauntsaninja's answer [here](https://datascience.stackexchange.com/a/89312) that
+adds new rules for common miscounts and adjusts based on common species-name endings.
 
 Uses the Python module [Pyphen](https://github.com/Kozea/Pyphen)
-for syllable calculation in most languages, but defaults to 
-[cmudict](https://github.com/prosegrinder/python-cmudict) for
-en_US.
+for syllable calculation in most other languages.
 
 #### Lexicon Count
 
 ```python
-textstat.lexicon_count(text, removepunct=True)
+textstatsci.lexicon_count(text, removepunct=True)
 ```
 
 Calculates the number of words present in the text.
@@ -438,7 +474,7 @@ before counting lexicon items.
 #### Sentence Count
 
 ```python
-textstat.sentence_count(text)
+textstatsci.sentence_count(text)
 ```
 
 Returns the number of sentences present in the given text.
@@ -446,7 +482,7 @@ Returns the number of sentences present in the given text.
 #### Character Count
 
 ```python
-textstat.char_count(text, ignore_spaces=True)
+textstatsci.char_count(text, ignore_spaces=True)
 ```
 
 Returns the number of characters present in the given text.
@@ -454,7 +490,7 @@ Returns the number of characters present in the given text.
 #### Letter Count
 
 ```python
-textstat.letter_count(text, ignore_spaces=True)
+textstatsci.letter_count(text, ignore_spaces=True)
 ```
 
 Returns the number of characters present in the given text without punctuation.
@@ -462,7 +498,7 @@ Returns the number of characters present in the given text without punctuation.
 #### Polysyllable Count
 
 ```python
-textstat.polysyllabcount(text)
+textstatsci.polysyllabcount(text)
 ```
 
 Returns the number of words with a syllable count greater than or equal to 3.
@@ -470,7 +506,7 @@ Returns the number of words with a syllable count greater than or equal to 3.
 #### Monosyllable Count
 
 ```python
-textstat.monosyllabcount(text)
+textstatsci.monosyllabcount(text)
 ```
 
 Returns the number of words with a syllable count equal to one.
@@ -478,10 +514,10 @@ Returns the number of words with a syllable count equal to one.
 ## Contributing
 
 If you find any problems, you should open an
-[issue](https://github.com/shivam5992/textstat/issues).
+[issue](https://github.com/robert-roth/textstatsci/issues).
 
 If you can fix an issue you've found, or another issue, you should open
-a [pull request](https://github.com/shivam5992/textstat/pulls).
+a [pull request](https://github.com/robert-roth/textstatsci/pulls).
 
 1. Fork this repository on GitHub to start making your changes to the master
 branch (or branch off of it).
@@ -496,8 +532,8 @@ https://docs.pipenv.org/) to keep your development work isolated from your
 systems Python installation.
 
 ```bash
-$ git clone https://github.com/<yourname>/textstat.git  # Clone the repo from your fork
-$ cd textstat
+$ git clone https://github.com/<yourname>/textstatsci.git  # Clone the repo from your fork
+$ cd textstatsci
 $ pip install -r requirements.txt  # Install all dependencies
 
 $ # Make changes
