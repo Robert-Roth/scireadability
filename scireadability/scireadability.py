@@ -106,7 +106,7 @@ SPECIES_NAME_ADJUSTMENTS = {
     "odes": 1,
     "eae": 1,
     "oides": 1,
-    "alei": 1,
+    "mallei": 1,
 }
 
 
