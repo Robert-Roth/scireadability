@@ -1,16 +1,32 @@
-# textstatsci
-### Textual statistics for science communication
+# scireadability
 
->`textstatsci` is a fork of the [textstat](https://github.com/shivam5992/textstat) Python library, originally created by Shivam Bansal and Chaitanya Aggarwal.  It builds upon textstat to provide improved text statistics for scientific and academic texts, particularly in handling specialized vocabulary like species names.
+**`scireadability` is a user-friendly Python library designed to calculate text statistics. It's helpful for assessing readability, complexity, and grade level of texts. While specifically enhanced for scientific documents, it works well with any type of text. Punctuation is removed by default, with the exception of apostrophes in contractions.**
 
-> Modifications include a built-in custom dictionary (and the ability to use your own) and improved handling for specialized vocabulary.
+This library is built upon the foundation of the [`textstat`](https://github.com/shivam5992/textstat) Python library, originally created by Shivam Bansal and Chaitanya Aggarwal.
 
-**textstatsci is an easy-to-use library to calculate statistics from text. It helps determine readability, complexity, and grade level. It is specialized for scientific texts, but can be applied to non-scientific texts as well. However, it is possible that the enhancements made with scientific texts in mind could impact accuracy of non-scientific texts.**
+## Why scireadability?
 
-## Usage
+While building upon the excellent `textstat` library, `scireadability` is specifically designed to address the unique challenges of analyzing scientific and technical texts. It offers improved accuracy for syllable counting, especially for scientific vocabulary and names. If you need readability statistics for academic papers, web pages, or any text containing specialized terms, `scireadability` provides enhanced accuracy.
+
+### Key features
+
+- Enhanced syllable counting accuracy, particularly for complex and scientific vocabulary.
+- Customizable syllable dictionary to handle exceptions and domain-specific terms, enhancing accuracy for specialized texts. Includes a built-in custom dictionary for common edge-cases.
+
+## Quick start
+
+### Install using pip
+
+```shell
+pip install scireadability
+```
+
+### Usage
+
+Here are a few examples to get you started:
 
 ```python
->>> import textstatsci
+>>> import scireadability
 
 >>> test_data = (
     "Within the heterogeneous canopy of the Amazonian rainforest, a fascinating interspecies interaction manifests "
@@ -23,521 +39,401 @@
     "the biochemical signaling involved in this symbiosis promises to elucidate novel ecological strategies."
 )
 
->>> textstatsci.flesch_reading_ease(test_data)
->>> textstatsci.flesch_kincaid_grade(test_data)
->>> textstatsci.smog_index(test_data)
->>> textstatsci.coleman_liau_index(test_data)
->>> textstatsci.automated_readability_index(test_data)
->>> textstatsci.dale_chall_readability_score(test_data)
->>> textstatsci.difficult_words(test_data)
->>> textstatsci.linsear_write_formula(test_data)
->>> textstatsci.gunning_fog(test_data)
->>> textstatsci.text_standard(test_data)
->>> textstatsci.fernandez_huerta(test_data)
->>> textstatsci.szigriszt_pazos(test_data)
->>> textstatsci.gutierrez_polini(test_data)
->>> textstatsci.crawford(test_data)
->>> textstatsci.gulpease_index(test_data)
->>> textstatsci.osman(test_data)
+>>> scireadability.flesch_reading_ease(test_data)
+>>> scireadability.flesch_kincaid_grade(test_data)
+>>> scireadability.smog_index(test_data)
+>>> scireadability.coleman_liau_index(test_data)
+>>> scireadability.automated_readability_index(test_data)
+>>> scireadability.dale_chall_readability_score(test_data)
+>>> scireadability.linsear_write_formula(test_data)
+>>> scireadability.gunning_fog(test_data)
+
+>>> # Using the custom dictionary:
+>>> scireadability.add_term_to_custom_dict("pterodactyl", 4) # Adding a word with its syllable count
+>>> scireadability.syllable_count("pterodactyl") # Now it will be counted correctly
 ```
 
-The argument (text) for all the defined functions remains the same —
-i.e the text for which statistics need to be calculated.
-
-## Install
-
-You can install textstatsci either via the Python Package Index (PyPI) or from source.
-
-### Install using pip
-
-```shell
-pip install textstatsci
-```
-
-### Install latest version from GitHub
-
-```shell
-git clone https://github.com/robert-roth/textstatsci.git
-cd textstatsci
-pip install .
-```
-
-### Install from PyPI
-
-Download the latest version of textstatsci from http://pypi.python.org/pypi/textstatsci/
-
-You can install it by doing the following:
-
-```shell
-tar xfz textstatsci-*.tar.gz
-cd textstatsci-*/
-python setup.py build
-python setup.py install # as root
-```
+For all functions, the input argument (`text`) remains the same: the text you want to analyze for readability statistics.
 
 ## Language support
-By default functions implement algorithms for English language. 
->Note that accuracy may suffer for non-English scientific texts. The custom dictionary and 
-> syllable counter fallbacks are based on pronunciations in American English.
 
-To change language, use:
+By default, the functions are configured for English language algorithms. Please be aware that accuracy may be reduced when used with non-English texts. The built-in custom dictionary and syllable counting methods are based on pronunciations in American English.  For syllable counting, `scireadability` relies on:
 
-```python
-textstatsci.set_lang(lang)
-``` 
+- **CMUdict**: For English, the Carnegie Mellon Pronouncing Dictionary (CMUdict) is used for accurate syllable counts.
+- **Pyphen**: For other languages, the Pyphen library is used if available. If the Pyphen dictionary for a specific language is not installed, a warning will be issued, and syllable counting may be less accurate. You can install Pyphen dictionaries using pip (e.g., `pip install pyphen`).
 
-The language will be used for syllable calculation and to choose 
-variant of the formula. 
-
-### Language variants
-All functions implement `en` language. Some of them has also variants 
-for other languages listed below. 
-
-|  Function                   | en | de | es | fr | it | nl | pl | ru |
-|-----------------------------|----|----|----|----|----|----|----|----|
-| flesch_reading_ease         | ✔  | ✔  | ✔  | ✔  | ✔  | ✔  |    | ✔  |
-| gunning_fog                 | ✔  |    |    |    |    |    | ✔  |    |
-
-#### Spanish-specific tests
-The following functions are specifically designed for Spanish language.
-They can be used on non-Spanish texts, even though that use case is not recommended.
+To change the language setting, use:
 
 ```python
->>> textstatsci.fernandez_huerta(test_data)
->>> textstatsci.szigriszt_pazos(test_data)
->>> textstatsci.gutierrez_polini(test_data)
->>> textstatsci.crawford(test_data)
+scireadability.set_lang(lang)
 ```
 
-Additional information on the formula they implement can be found in their respective docstrings.
+The specified language will be used for syllable calculation, to load language-specific resources like CMUdict or Pyphen, and to select the appropriate formula variant where available.  The `set_lang()` function not only changes the language but also:
 
-### Custom Syllable Dictionary
+- Loads `cmudict` when set to English ("en") or sets it to `None` for other languages.
+- Attempts to load `Pyphen` for non-English languages.
+- Clears internal caches to ensure language changes are applied immediately.
 
-Textstatsci allows you to customize the syllable counts for words that might be miscounted by the default algorithm or to add counts for words not present in the base dictionaries. This is particularly useful for:
+For Spanish-specific readability tests (fernandez_huerta, szigriszt_pazos, gutierrez_polini, crawford), it is not recommended to use them on non-Spanish texts as they are specifically designed for the Spanish language.
 
-*   **Handling exceptions:** Correcting syllable counts for words that are exceptions to general syllabification rules (e.g., proper nouns, different pronunciations).
-*   **Adding specialized vocabulary:** Including syllable counts for terms specific to your domain or field that might not be in standard dictionaries, such as species names and drug names.
-*   **Improving accuracy:** Fine-tuning syllable counts to enhance the precision of readability scores and other text statistics.
+## Custom syllable dictionary
+
+`scireadability` allows you to customize syllable counts for words that the default algorithm might miscount or to include words not found in the standard dictionaries. Custom dictionaries are managed per language. When you load or modify a custom dictionary, it applies to the currently set language. This feature is particularly useful for:
+
+- **Handling exceptions**: Correcting syllable counts for words that don't follow typical pronunciation rules.
+- **Adding specialized vocabulary**: Including syllable counts for terms specific to certain fields that are not in general dictionaries.
+- **Improving accuracy**: Fine-tuning syllable counts to enhance the precision of readability scores and other text statistics.
 
 **Managing Your Custom Dictionary**
 
-Textstatsci comes prebundled with a custom dictionary (`resources/en/custom_dict.json`) that is loaded with some words that are poorly handled by syllable counters. Textstatsci also provides utilities to manage your custom syllable dictionary. These dictionaries are stored as JSON files in your user configuration directory (the location of which depends on your operating system, but is typically within your user profile under a directory named `.textstatsci` or similar).
+`scireadability` includes a pre-built custom dictionary (`resources/en/custom_dict.json`) that contains words often miscounted by standard syllable counters. The library also provides tools to manage your custom syllable dictionary. These dictionaries are stored as JSON files in your user configuration directory. The exact location depends on your operating system but is usually within your user profile in a directory named `.scireadability` or similar.
 
-The dictionary uses the following functions to interact with the custom dictionary:
+You can use the following functions to interact with the custom dictionary:
 
-*   **`load_custom_syllable_dict(lang="en")`**:  Loads the currently active custom syllable dictionary for the specified language (default is English - "en"). This function prioritizes a user-defined dictionary if it exists, falling back to the default dictionary provided with the package if no user dictionary is found. The loaded dictionary is case-insensitive for word lookups.
-
-*   **`overwrite_custom_dict(file_path, lang="en")`**: Replaces your entire custom dictionary for the given language with the contents of a JSON file you provide at `file_path`. The JSON file must be formatted correctly (see "Dictionary file format" below).
-
-*   **`add_term_to_custom_dict(word, syllable_count, lang="en")`**: Adds a single `word` with a specified `syllable_count` to your custom dictionary. If the `word` already exists, its syllable count will be updated to the new value.
-
-*   **`add_terms_from_file(file_path, lang="en")`**:  Allows you to add multiple terms to your custom dictionary from a JSON file at `file_path`. The JSON file should contain a dictionary of words and their syllable counts under the `"CUSTOM_SYLLABLE_DICT"` key (see "Dictionary file format" below).
-
-*   **`revert_custom_dict_to_default(lang="en")`**: Resets your custom dictionary for the specified language back to the original default dictionary that comes with textstatsci. This effectively removes all your custom word additions and overrides.
-
-*   **`print_custom_dict(lang="en")`**: Prints the contents of your currently loaded custom dictionary to the console in a readable JSON format. Useful for inspecting the dictionary's contents.
+- `load_custom_syllable_dict(lang="en")`: Loads the active custom dictionary for the specified language. If no user-defined dictionary exists, it loads the default dictionary.
+- `overwrite_custom_dict(file_path, lang="en")`: Replaces your entire custom dictionary for the given language with the contents of a JSON file you provide.
+- `add_term_to_custom_dict(word, syllable_count, lang="en")`: Adds a new word and its syllable count to the custom dictionary, or updates the count if the word already exists.
+- `add_terms_from_file(file_path, lang="en")`: Adds multiple words and their syllable counts from a JSON file. This file should contain a key `"CUSTOM_SYLLABLE_DICT"` which maps words to their integer syllable counts.
+- `revert_custom_dict_to_default(lang="en")`: Resets your custom dictionary back to the original default dictionary.
+- `print_custom_dict(lang="en")`: Prints the contents of your currently loaded custom dictionary in a readable JSON format.
 
 **Dictionary file format**
-
-Custom dictionary files (used with `overwrite_custom_dict` and `add_terms_from_file`) must be valid JSON files with the following structure:
 
 ```json
 {
   "CUSTOM_SYLLABLE_DICT": {
-    "word1": syllable_count1,
-    "word2": syllable_count2,
-    "anotherword": 4,
-    "...": "..."
+    "word1": 3,
+    "word2": 2,
+    "anotherword": 4
   }
 }
 ```
-#### Schema:
 
-- The top-level JSON object must contain a key named "CUSTOM_SYLLABLE_DICT".
-- The value associated with "CUSTOM_SYLLABLE_DICT" must be a JSON object (dictionary).
-- Within this dictionary, keys are words (strings), and values are their corresponding syllable counts (integers).
-## List of Functions
+The top-level JSON object must have a key named `"CUSTOM_SYLLABLE_DICT"`. Within this object, each key is a word (string), and its corresponding value is the word's syllable count (integer).
+
+## Controlling apostrophe handling
+
+```python
+scireadability.set_rm_apostrophe(rm_apostrophe)
+```
+
+The `set_rm_apostrophe` function allows you to control how apostrophes in contractions are handled when counting words, syllables, and characters.
+
+By default (`rm_apostrophe=False`), `scireadability` **retains apostrophes in common English contractions** (like "don't" or "can't") and treats these contractions as single words. This is because CMUdict accurately counts contractions. All other punctuation (periods, commas, question marks, exclamation points, hyphens, etc.) is removed.
+
+If you call `scireadability.set_rm_apostrophe(True)`, **apostrophes in contractions will also be removed** along with all other punctuation. In this mode, contractions might be counted as multiple words depending on the context (though `scireadability` generally still treats contractions as single lexical units).
+
+**Example:**
+
+```python
+>>> import scireadability
+>>> text_example = "Let's analyze this sentence with contractions like aren't and it's."
+
+>>> scireadability.set_rm_apostrophe(False) # Default behavior
+>>> word_count_default = scireadability.lexicon_count(text_example)
+>>> print(f"Word count with default apostrophe handling: {word_count_default}")
+
+>>> scireadability.set_rm_apostrophe(True) # Remove apostrophes
+>>> word_count_remove_apostrophe = scireadability.lexicon_count(text_example)
+>>> print(f"Word count with apostrophes removed: {word_count_remove_apostrophe}")
+```
+
+Choose the apostrophe handling mode that best suits your analysis needs.  For most general readability assessments, the default behavior (`rm_apostrophe=False`) is recommended.
+
+## Controlling output rounding
+
+```python
+scireadability.set_rounding(rounding, points=None)
+```
+
+The `set_rounding` function lets you control whether the numerical outputs of `scireadability` functions are rounded and to how many decimal places.
+
+By default, output rounding is disabled (`rounding=False`), and you will receive scores with their full decimal precision.
+
+To enable rounding, call `scireadability.set_rounding(True, points)`, where `points` is an integer specifying the number of decimal places to round to. If `points` is `None` (or not provided), it defaults to rounding to the nearest whole number (0 decimal places).
+
+**Example:**
+
+```python
+>>> import scireadability
+>>> text_example = "This is a text for demonstrating rounding."
+>>> score_unrounded = scireadability.flesch_reading_ease(text_example)
+>>> print(f"Unrounded Flesch Reading Ease: {score_unrounded}")
+
+>>> scireadability.set_rounding(True, 2) # Enable rounding to 2 decimal places
+>>> score_rounded_2_decimal = scireadability.flesch_reading_ease(text_example)
+>>> print(f"Rounded to 2 decimal places: {score_rounded_2_decimal}")
+
+>>> scireadability.set_rounding(True) # Enable rounding to whole number (0 decimals)
+>>> score_rounded_whole = scireadability.flesch_reading_ease(text_example)
+>>> print(f"Rounded to whole number: {score_rounded_whole}")
+```
+
+Use `set_rounding` to format the output scores according to your desired level of precision.
+
+
+## List of functions
 
 ### Formulas
 
-#### The Flesch Reading Ease formula
+**Flesch Reading Ease**
 
 ```python
-textstatsci.flesch_reading_ease(text)
+scireadability.flesch_reading_ease(text)
 ```
 
-Returns the Flesch Reading Ease Score.
+Returns the Flesch Reading Ease score. A higher score indicates greater text readability. Scores can range up to a maximum of approximately 121, with negative scores possible for extremely complex texts.  The formula is based on average sentence length and average syllables per word. The formula's parameters (base score, sentence length factor, syllable per word factor) are language-dependent and can be configured for different languages using the `set_lang()` function.
 
-The following table can be helpful to assess the ease of
-readability in a document.
+| Score   | Difficulty       |
+|---------|------------------|
+| 90-100  | Very Easy        |
+| 80-89   | Easy             |
+| 70-79   | Fairly Easy      |
+| 60-69   | Standard         |
+| 50-59   | Fairly Difficult |
+| 30-49   | Difficult        |
+| 0-29    | Very Confusing   |
 
-The table is an _example_ of values. While the
-maximum score is 121.22, there is no limit on how low
-the score can be. A negative score is valid.
-
-| Score |    Difficulty     |
-|-------|-------------------|
-|90-100 | Very Easy         |
-| 80-89 | Easy              |
-| 70-79 | Fairly Easy       |
-| 60-69 | Standard          |
-| 50-59 | Fairly Difficult  |
-| 30-49 | Difficult         |
-| 0-29  | Very Confusing    |
-
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease)
-
-#### The Flesch-Kincaid Grade Level
+**Flesch-Kincaid Grade Level**
 
 ```python
-textstatsci.flesch_kincaid_grade(text)
+scireadability.flesch_kincaid_grade(text)
 ```
 
-Returns the Flesch-Kincaid Grade of the given text. This is a grade
-formula in that a score of 9.3 means that a ninth grader would be able to
-read the document.
+Returns the Flesch-Kincaid Grade Level. For example, a score of 9.3 suggests that the text is readable for a student in the 9th grade. This formula estimates the U.S. grade level equivalent to understand the text. It is calculated based on average sentence length and average syllables per word.
 
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level)
-
-#### The Fog Scale (Gunning FOG Formula)
+**Gunning Fog Index**
 
 ```python
-textstatsci.gunning_fog(text)
+scireadability.gunning_fog(text)
 ```
 
-Returns the FOG index of the given text. This is a grade formula in that
-a score of 9.3 means that a ninth grader would be able to read the document.
+Returns the Gunning Fog Index. A score of 9.3 indicates that the text is likely understandable to a 9th-grade student. The Gunning Fog Index estimates the years of formal education required for a person to understand the text on the first reading. It uses average sentence length and the percentage of complex words (words with more than two syllables).
 
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Gunning_fog_index)
-
-#### The SMOG Index
+**SMOG Index**
 
 ```python
-textstatsci.smog_index(text)
+scireadability.smog_index(text)
 ```
 
-Returns the SMOG index of the given text. This is a grade formula in that
-a score of 9.3 means that a ninth grader would be able to read the document.
+Returns the SMOG Index. This formula is most reliable for texts containing at least 30 sentences. `scireadability` requires a minimum of 3 sentences to calculate this index. The SMOG Index (Simple Measure of Gobbledygook) is another grade-level readability test. It focuses on polysyllabic words (words with three or more syllables) and sentence count to estimate reading difficulty.
 
-Texts of fewer than 30 sentences are statistically invalid, because
-the SMOG formula was normed on 30-sentence samples. textstatsci requires at
-least 3 sentences for a result.
-
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/SMOG)
-
-#### Automated Readability Index
+**Automated Readability Index (ARI)**
 
 ```python
-textstatsci.automated_readability_index(text)
+scireadability.automated_readability_index(text)
 ```
 
-Returns the ARI (Automated Readability Index) which outputs
-a number that approximates the grade level needed to
-comprehend the text.
+Returns the Automated Readability Index (ARI). A score of 6.5 suggests the text is suitable for students in 6th to 7th grade. The ARI estimates the grade level needed to understand the text. It uses character count, word count, and sentence count in its calculation.
 
-For example if the ARI is 6.5, then the grade level to comprehend
-the text is 6th to 7th grade.
-
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Automated_readability_index)
-
-#### The Coleman-Liau Index
+**Coleman-Liau Index**
 
 ```python
-textstatsci.coleman_liau_index(text)
+scireadability.coleman_liau_index(text)
 ```
 
-Returns the grade level of the text using the Coleman-Liau Formula. This is
-a grade formula in that a score of 9.3 means that a ninth grader would be
-able to read the document.
+Returns the Coleman-Liau Index grade level. For example, a score of 9.3 indicates that the text is likely readable for a 9th-grade student. The Coleman-Liau Index relies on character count per word and sentence count per word, rather than syllable count, to estimate the grade level.
 
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index)
-
-#### Linsear Write Formula
+**Linsear Write Formula**
 
 ```python
-textstatsci.linsear_write_formula(text)
+scireadability.linsear_write_formula(text)
 ```
 
-Returns the grade level using the Linsear Write Formula. This is
-a grade formula in that a score of 9.3 means that a ninth grader would be
-able to read the document.
+Returns the estimated grade level of the text based on the Linsear Write Formula. This formula is unique in that it only uses the first 100 words of the text to calculate readability. It counts "easy words" (1-2 syllables) and "difficult words" (3+ syllables) in this sample.
 
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Linsear_Write)
-
-#### Dale-Chall Readability Score
+**Dale-Chall Readability Score**
 
 ```python
-textstatsci.dale_chall_readability_score(text)
+scireadability.dale_chall_readability_score(text)
 ```
 
-Different from other tests, since it uses a lookup table
-of the most commonly used 3000 English words. Thus it returns
-the grade level using the New Dale-Chall Formula.
+Calculates readability using a lookup table of the 3,000 most common English words. The resulting score corresponds to a grade level as follows:
 
-| Score       |  Understood by                                |
-|-------------|-----------------------------------------------|
-|4.9 or lower | average 4th-grade student or lower            |
-|  5.0–5.9    | average 5th or 6th-grade student              |
-|  6.0–6.9    | average 7th or 8th-grade student              |
-|  7.0–7.9    | average 9th or 10th-grade student             |
-|  8.0–8.9    | average 11th or 12th-grade student            |
-|  9.0–9.9    | average 13th to 15th-grade (college) student  |
+| Score         | Understood by                                   |
+|---------------|-------------------------------------------------|
+| 4.9 or lower  | Average 4th-grade student or below              |
+| 5.0–5.9       | Average 5th or 6th-grade student                |
+| 6.0–6.9       | Average 7th or 8th-grade student                |
+| 7.0–7.9       | Average 9th or 10th-grade student               |
+| 8.0–8.9       | Average 11th or 12th-grade student              |
+| 9.0–9.9       | Average 13th to 15th-grade (college) student    |
 
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Dale%E2%80%93Chall_readability_formula)
-
-#### Readability Consensus based upon all the above tests
+**Readability Consensus (Text Standard)**
 
 ```python
-textstatsci.text_standard(text, float_output=False)
+scireadability.text_standard(text, float_output=False)
 ```
 
-Based upon all the above tests, returns the estimated school
-grade level required to understand the text.
+Provides an estimated school grade level based on a consensus of all the readability tests included in this library. It aggregates the grade level outputs from Flesch-Kincaid Grade Level, Flesch Reading Ease, SMOG Index, Coleman-Liau Index, Automated Readability Index, Dale-Chall Readability Score, Linsear Write Formula, and Gunning Fog Index to provide a consolidated readability grade. Setting `float_output=True` will return a numerical average grade level instead of an integer-based level.
 
-Optional `float_output` allows the score to be returned as a
-`float`. Defaults to `False`.
-
-#### Spache Readability Formula
+**Spache Readability Formula**
 
 ```python
-textstatsci.spache_readability(text)
+scireadability.spache_readability(text)
 ```
 
-Returns grade level of english text.
+Returns a grade level score for English text, primarily designed for texts aimed at or below the 4th-grade reading level. The Spache formula is specifically tailored for assessing the readability of texts for young children, focusing on sentence length and the proportion of "hard words" (words not on a list of common words).
 
-Intended for text written for children up to grade four.
-
-> Further reading on
-[Wikipedia](https://en.wikipedia.org/wiki/Spache_readability_formula)
-
-#### McAlpine EFLAW Readability Score
+**McAlpine EFLAW Readability Score**
 
 ```python
-textstatsci.mcalpine_eflaw(text)
+scireadability.mcalpine_eflaw(text)
 ```
 
-Returns a score for the readability of an english text for a foreign learner or
-English, focusing on the number of miniwords and length of sentences.
+Returns a readability score for English text intended for foreign language learners. A score of 25 or lower is generally recommended for learners. The McAlpine EFLAW score is designed to evaluate text readability for learners of English as a Foreign Language. It considers word count, "mini-word" count (words with 3 letters or less), and sentence count.
 
-It is recommended to aim for a score equal to or lower than 25. 
-
-> Further reading on
-[This blog post](https://strainindex.wordpress.com/2009/04/30/mcalpine-eflaw-readability-score/)
-
-#### Reading Time
+**Reading time estimation**
 
 ```python
-textstatsci.reading_time(text, ms_per_char=14.69)
+scireadability.reading_time(text, ms_per_char=14.69)
 ```
 
-Returns the reading time of the given text.
+Returns an estimated reading time for the text in milliseconds. It uses a default reading speed of 14.69 milliseconds per character, but you can adjust this using the `ms_per_char` parameter. This function provides a rough estimate of how long it might take to read the text, based on the number of characters and an assumed reading speed.
 
-Assumes 14.69ms per character.
+### Language-specific formulas
 
-> Further reading in
-[This academic paper](https://homepages.inf.ed.ac.uk/keller/papers/cognition08a.pdf)
-
-### Language Specific Formulas 
-#### Índice de lecturabilidad Fernandez-Huerta (Spanish)  
+**Índice de Lecturabilidad Fernandez-Huerta (Spanish)**
 
 ```python
-textstatsci.fernandez_huerta(text)
+scireadability.fernandez_huerta(text)
 ```
 
-Reformulation of the Flesch Reading Ease Formula specifically for spanish.
-The results can be interpreted similarly
+A Spanish-language reformulation of the Flesch Reading Ease formula. This formula adapts the Flesch Reading Ease principles to better suit the characteristics of the Spanish language.
 
-> Further reading on
-[This blog post](https://legible.es/blog/lecturabilidad-fernandez-huerta/)
-
-#### Índice de perspicuidad de Szigriszt-Pazos (Spanish)  
+**Índice de Perspicuidad de Szigriszt-Pazos (Spanish)**
 
 ```python
-textstatsci.szigriszt_pazos(text)
+scireadability.szigriszt_pazos(text)
 ```
-Adaptation of Flesch Reading Ease formula for spanish-based texts.
 
-Attempts to quantify how understandable a text is.
+An adaptation of the Flesch Reading Ease formula specifically tailored for Spanish texts.  Similar to Fernandez-Huerta, this is another Spanish adaptation of Flesch Reading Ease, with slightly different weighting of factors.
 
-> Further reading on
-[This blog post](https://legible.es/blog/perspicuidad-szigriszt-pazos/)
-
-#### Fórmula de comprensibilidad de Gutiérrez de Polini (Spanish)  
+**Fórmula de Comprensibilidad de Gutiérrez de Polini (Spanish)**
 
 ```python
-textstatsci.gutierrez_polini(text)
+scireadability.gutierrez_polini(text)
 ```
 
-Returns the Guttiérrez de Polini understandability index.
+Returns the Gutiérrez de Polini Understandability Index. This formula is designed for Spanish texts intended for grade-school levels. This index is specifically developed for assessing the comprehensibility of Spanish texts for elementary school children.
 
-Specifically designed for the texts in spanish, not an adaptation.
-Conceived for grade-school level texts.
-
-Scores for more complex text are not reliable.
-
-> Further reading on
-[This blog post](https://legible.es/blog/comprensibilidad-gutierrez-de-polini/)
-
-#### Fórmula de Crawford (Spanish)  
+**Fórmula de Crawford (Spanish)**
 
 ```python
-textstatsci.crawford(text)
+scireadability.crawford(text)
 ```
 
-Returns the Crawford score for the text.
+Returns an estimate of the years of schooling required to understand a Spanish text. This formula is intended for elementary-level Spanish texts. The Crawford formula estimates the years of education needed to understand Spanish text aimed at elementary school levels.
 
-Returns an estimate of the years of schooling required to understand the text.
-
-The text is only valid for elementary school level texts.
-
-> Further reading on
-[This blog post](https://legible.es/blog/formula-de-crawford/)
-
-#### Osman (Arabic)
+**Osman Score (Arabic)**
 
 ```python
-textstatsci.osman(text)
+scireadability.osman(text)
 ```
 
-Returns OSMAN score for text.
+Returns the Osman score, which is an adaptation of the Flesch and Fog formulas for Arabic texts. The Osman index adapts principles from Flesch and Gunning Fog to create a readability score suitable for Arabic language texts.
 
-Designed for Arabic, an adaption of Flesch and Fog Formula.
-Introduces a new factor called "Faseeh".
-
-> Further reading in
-[This academic paper](https://www.aclweb.org/anthology/L16-1038.pdf)
-
-#### Gulpease Index (Italian)
+**Gulpease Index (Italian)**
 
 ```python
-textstatsci.gulpease_index(text)
+scireadability.gulpease_index(text)
 ```
 
-Returns the Gulpease index of Italian text, which translates to 
-level of education completed.
+Returns the Gulpease index for Italian texts. Lower scores indicate more difficult text. The Gulpease Index is designed for Italian and, unlike many other indices, a *lower* score indicates *higher* reading difficulty.
 
-Lower scores require higher level of education to read with ease.
-
-> Further reading on
-[Wikipedia](https://it.wikipedia.org/wiki/Indice_Gulpease)
-
-#### Wiener Sachtextformel (German)
+**Wiener Sachtextformel (German)**
 
 ```python
-textstatsci.wiener_sachtextformel(text, variant)
+scireadability.wiener_sachtextformel(text, variant)
 ```
 
-Returns a grade level score for the given text.
+Returns a grade-level style readability score for German text. The score ranges approximately from 4 (very easy) to 15 (very difficult).  The Wiener Sachtextformel has different variants; the `variant` parameter allows you to choose between these variations (1 to 4), each with slightly different weighting of factors like polysyllable count and sentence length.
 
-A value of 4 means very easy text, whereas 15 means very difficult text.
+### Aggregates and averages
 
-> Further reading on
-[Wikipedia](https://de.wikipedia.org/wiki/Lesbarkeitsindex#Wiener_Sachtextformel)
-
-### Aggregates and Averages
-
-#### Syllable Count
+**Syllable count**
 
 ```python
-textstatsci.syllable_count(text)
+scireadability.syllable_count(text)
 ```
 
-Returns the number of syllables present in the given text.
-All syllable counts first check the custom dictionary, then, in English, uses [cmudit](https://github.com/prosegrinder/python-cmudict).
-For words not in cmudict, a regex-based counter (which agrees with cmudict ~91% of the time)
-is used. The regex is a refined version of hauntsaninja's answer [here](https://datascience.stackexchange.com/a/89312) that
-adds new rules for common miscounts and adjusts based on common species-name endings.
+Returns the total number of syllables in the input text. It first checks against custom dictionaries, then uses cmudict (for English), and finally falls back to a regex-based syllable counting method for English if CMUdict fails. For non-English languages, if Pyphen is available, it's used; otherwise, no fallback is applied. This function is affected by the `set_rm_apostrophe()` setting, as punctuation is removed before counting.
 
-Uses the Python module [Pyphen](https://github.com/Kozea/Pyphen)
-for syllable calculation in most other languages.
-
-#### Lexicon Count
+**Word count (lexicon Count)**
 
 ```python
-textstatsci.lexicon_count(text, removepunct=True)
+scireadability.lexicon_count(text, removepunct=True)
 ```
 
-Calculates the number of words present in the text.
-Optional `removepunct` specifies whether we need to take
-punctuation symbols into account while counting lexicons.
-Default value is `True`, which removes the punctuation
-before counting lexicon items.
+Calculates the number of words in the text. By default, punctuation is removed before counting (`removepunct=True`). You can control apostrophe handling using `set_rm_apostrophe()`.  Hyphenated words and contractions are generally counted as single words.
 
-#### Sentence Count
+**Sentence count**
 
 ```python
-textstatsci.sentence_count(text)
+scireadability.sentence_count(text)
 ```
 
-Returns the number of sentences present in the given text.
+Returns the number of sentences identified in the text. It uses regular expressions to detect sentence boundaries based on sentence-ending punctuation marks (., !, ?). Short "sentences" of 2 words or less are ignored to avoid miscounting headings or fragments.
 
-#### Character Count
+**Character count**
 
 ```python
-textstatsci.char_count(text, ignore_spaces=True)
+scireadability.char_count(text, ignore_spaces=True)
 ```
 
-Returns the number of characters present in the given text.
+Returns the total number of characters in the text. Spaces are ignored by default (`ignore_spaces=True`). This function simply counts all characters, including letters, numbers, punctuation, and symbols (unless spaces are ignored).
 
-#### Letter Count
+**Letter count**
 
 ```python
-textstatsci.letter_count(text, ignore_spaces=True)
+scireadability.letter_count(text, ignore_spaces=True)
 ```
 
-Returns the number of characters present in the given text without punctuation.
+Returns the number of letters in the text, excluding punctuation and spaces. Spaces are ignored by default (`ignore_spaces=True`). This function counts only alphabetic characters (a-z, A-Z) after removing punctuation (based on the `set_rm_apostrophe()` setting).
 
-#### Polysyllable Count
+**Polysyllable count**
 
 ```python
-textstatsci.polysyllabcount(text)
+scireadability.polysyllabcount(text)
 ```
 
-Returns the number of words with a syllable count greater than or equal to 3.
+Returns the number of words in the text that have three or more syllables. It uses `syllable_count()` to determine the number of syllables for each word.
 
-#### Monosyllable Count
+**Monosyllable count**
 
 ```python
-textstatsci.monosyllabcount(text)
+scireadability.monosyllabcount(text)
 ```
 
-Returns the number of words with a syllable count equal to one.
+Returns the number of words in the text that have exactly one syllable. It uses `syllable_count()` to determine the number of syllables for each word.
+
+## Advanced usage and customization
+
+`scireadability` incorporates several advanced features for customization and performance:
+
+- **Caching**: For efficiency, `scireadability` extensively uses caching (via `@lru_cache`) to store the results of computationally intensive functions like syllable count and various text statistics. This significantly speeds up repeated analyses of the same or similar texts. Caches are automatically cleared when you change the language using `set_lang()`.
+- **Extending Language Support**: While `scireadability` provides built-in support for several languages, you can potentially contribute to expanding language support. Language-specific parameters for formulas are defined in the internal `langs` dictionary. Contributions of new language configurations and easy word lists are welcome.
+
+## Limitations
+
+Please be aware of the following limitations:
+
+- **SMOG Index sentence requirement**: The SMOG Index formula is most reliable for texts with at least 30 sentences. `scireadability` will return 0.0 if the text has fewer than 3 sentences when calculating the SMOG index.
+- **Short texts**: Readability formulas are generally designed for paragraphs or longer texts. Applying them to very short texts (e.g., single sentences or phrases) may yield less meaningful or less stable results.
+- **Highly-specialized jargon**: While `scireadability` is enhanced for scientific texts, extremely dense or novel jargon not present in CMUdict, Pyphen, or custom dictionaries might still affect syllable counting accuracy and, consequently, readability scores. For highly domain-specific texts, careful review and custom dictionary adjustments may be beneficial.
+- **Syllable, sentence, and word counting**: Counting these accurately is inherently difficult. While `scireadability` makes every attempt to
+accurately count, its approach is heuristic-based for efficiency and ease-of-use. For non-English tests, Pyphen is used as a fallback, which is not accurate for syllable counts. The regex-based syllable
+count for English fallback (a refined version of hauntsaninja's base regex [here](https://datascience.stackexchange.com/a/89312)) agrees with CMUdict ~91% of the time.
 
 ## Contributing
 
-If you find any problems, you should open an
-[issue](https://github.com/robert-roth/textstatsci/issues).
+If you encounter any issues, please open an
+[issue](https://github.com/robert-roth/scireadability/issues) to report it or provide feedback on the
+[Try it page]([TRY_IT_PAGE_URL]).
 
-If you can fix an issue you've found, or another issue, you should open
-a [pull request](https://github.com/robert-roth/textstatsci/pulls).
+If you are able to fix a bug or implement a new feature, we welcome you to submit a
+[pull request](https://github.com/robert-roth/scireadability/pulls).
 
-1. Fork this repository on GitHub to start making your changes to the master
-branch (or branch off of it).
-2. Write a test which shows that the bug was fixed or that the feature works as expected.
-3. Send a pull request!
-
-### Development setup
-
-> It is recommended you use a [virtual environment](
-https://docs.python.org/3/tutorial/venv.html), or [Pipenv](
-https://docs.pipenv.org/) to keep your development work isolated from your
-systems Python installation.
-
-```bash
-$ git clone https://github.com/<yourname>/textstatsci.git  # Clone the repo from your fork
-$ cd textstatsci
-$ pip install -r requirements.txt  # Install all dependencies
-
-$ # Make changes
-
-$ python -m pytest test.py  # Run tests
-```
-
+1. Fork this repository on GitHub to begin making your changes on the master branch (or create a new branch from it).
+2. Write a test to demonstrate that the bug is fixed or that the new feature functions as expected.
+3. Submit a pull request with your changes!

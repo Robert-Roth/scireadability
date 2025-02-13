@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 
-"""Test suite for textstatsci"""
+"""Test suite for scireadability"""
 
 import json
 import os
 import shutil
-from textstatsci import dictionary_utils
-import textstatsci
+from scireadability import dictionary_utils
+import scireadability
 import pytest
 
 
@@ -244,9 +244,9 @@ hard_arabic_text = (
 
 
 def test_char_count():
-    textstatsci.set_lang("en")
-    count = textstatsci.char_count(long_test)
-    count_spaces = textstatsci.char_count(
+    scireadability.set_lang("en")
+    count = scireadability.char_count(long_test)
+    count_spaces = scireadability.char_count(
         long_test, ignore_spaces=False
     )
 
@@ -255,9 +255,9 @@ def test_char_count():
 
 
 def test_letter_count():
-    textstatsci.set_lang("en")
-    count = textstatsci.letter_count(long_test)
-    count_spaces = textstatsci.letter_count(
+    scireadability.set_lang("en")
+    count = scireadability.letter_count(long_test)
+    count_spaces = scireadability.letter_count(
         long_test, ignore_spaces=False
     )
 
@@ -266,28 +266,28 @@ def test_letter_count():
 
 
 def test_remove_punctuation_incl_apostrophe():
-    textstatsci.set_lang('en')
-    textstatsci.set_rm_apostrophe(True)
-    text = textstatsci.remove_punctuation(punct_text)
+    scireadability.set_lang('en')
+    scireadability.set_rm_apostrophe(True)
+    text = scireadability.remove_punctuation(punct_text)
 
     # set the __rm_apostrophe attribute back to the default
-    textstatsci.set_rm_apostrophe(False)
+    scireadability.set_rm_apostrophe(False)
 
     assert text == punct_text_result_wo_apostr
 
 
 def test_remove_punctuation_excl_apostrophe():
-    textstatsci.set_lang('en')
-    textstatsci.set_rm_apostrophe(False)
-    text = textstatsci.remove_punctuation(punct_text)
+    scireadability.set_lang('en')
+    scireadability.set_rm_apostrophe(False)
+    text = scireadability.remove_punctuation(punct_text)
 
     assert text == punct_text_result_w_apostr
 
 
 def test_lexicon_count():
-    textstatsci.set_lang("en")
-    count = textstatsci.lexicon_count(long_test)
-    count_punc = textstatsci.lexicon_count(long_test, removepunct=False)
+    scireadability.set_lang("en")
+    count = scireadability.lexicon_count(long_test)
+    count_punc = scireadability.lexicon_count(long_test, removepunct=False)
 
     assert count == 372
     assert count_punc == 376
@@ -326,422 +326,422 @@ def test_lexicon_count():
     ]
 )
 def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
-    textstatsci.set_lang(lang)
-    count = textstatsci.syllable_count(text)
+    scireadability.set_lang(lang)
+    count = scireadability.syllable_count(text)
     diff = abs(count - n_syllables)
 
     assert diff <= margin
 
 
 def test_sentence_count():
-    textstatsci.set_lang("en")
-    count = textstatsci.sentence_count(long_test)
+    scireadability.set_lang("en")
+    count = scireadability.sentence_count(long_test)
 
     assert count == 17
 
 
 def test_sentence_count_russian():
-    textstatsci.set_lang('ru_RU')
-    count = textstatsci.sentence_count(long_russian_text_guillemets)
+    scireadability.set_lang('ru_RU')
+    count = scireadability.sentence_count(long_russian_text_guillemets)
 
     assert count == 16
 
 
 def test_avg_sentence_length():
-    textstatsci.set_lang("en")
-    avg = textstatsci.avg_sentence_length(long_test)
+    scireadability.set_lang("en")
+    avg = scireadability.avg_sentence_length(long_test)
 
     assert avg == 21.88235294117647
 
 
 def test_avg_syllables_per_word():
-    textstatsci.set_lang("en")
-    avg = textstatsci.avg_syllables_per_word(long_test)
+    scireadability.set_lang("en")
+    avg = scireadability.avg_syllables_per_word(long_test)
 
     assert avg == 1.4758064516129032
 
 
 def test_avg_letter_per_word():
-    textstatsci.set_lang("en")
-    avg = textstatsci.avg_letter_per_word(long_test)
+    scireadability.set_lang("en")
+    avg = scireadability.avg_letter_per_word(long_test)
 
     assert avg == 4.532258064516129
 
 
 def test_avg_sentence_per_word():
-    textstatsci.set_lang("en")
-    avg = textstatsci.avg_sentence_per_word(long_test)
+    scireadability.set_lang("en")
+    avg = scireadability.avg_sentence_per_word(long_test)
 
     assert avg == 0.0456989247311828
 
 
 def test_flesch_reading_ease():
-    textstatsci.set_lang("en")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 59.77118595825428
 
-    textstatsci.set_lang("de_DE")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("de_DE")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 66.27893738140419
 
-    textstatsci.set_lang("es_ES")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("es_ES")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 86.77806451612905
 
-    textstatsci.set_lang("fr_FR")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("fr_FR")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 82.30339025932953
 
-    textstatsci.set_lang("it_IT")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("it_IT")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 91.61745730550285
 
-    textstatsci.set_lang("nl_NL")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("nl_NL")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 66.01666982922202
 
-    textstatsci.set_lang("ru_RU")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("ru_RU")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 118.28794117647061
 
 
 def test_flesch_kincaid_grade():
-    textstatsci.set_lang("en")
-    score = textstatsci.flesch_kincaid_grade(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.flesch_kincaid_grade(long_test)
 
     assert score == 10.358633776091082
 
 
 def test_polysyllabcount():
-    textstatsci.set_lang("en")
-    count = textstatsci.polysyllabcount(long_test)
+    scireadability.set_lang("en")
+    count = scireadability.polysyllabcount(long_test)
 
     assert count == 38
 
 
 def test_smog_index():
-    textstatsci.set_lang("en")
-    index = textstatsci.smog_index(long_test)
+    scireadability.set_lang("en")
+    index = scireadability.smog_index(long_test)
 
     assert index == 11.670169846198839
 
 
 def test_coleman_liau_index():
-    textstatsci.set_lang("en")
-    index = textstatsci.coleman_liau_index(long_test)
+    scireadability.set_lang("en")
+    index = scireadability.coleman_liau_index(long_test)
 
     assert index == 9.13440860215054
 
 
 def test_automated_readability_index():
-    textstatsci.set_lang("en")
-    index = textstatsci.automated_readability_index(long_test)
+    scireadability.set_lang("en")
+    index = scireadability.automated_readability_index(long_test)
 
     assert index == 11.643111954459208
 
 
 def test_linsear_write_formula():
-    textstatsci.set_lang("en")
-    result = textstatsci.linsear_write_formula(long_test)
+    scireadability.set_lang("en")
+    result = scireadability.linsear_write_formula(long_test)
 
     assert result == 15.25
 
-    result = textstatsci.linsear_write_formula(empty_str)
+    result = scireadability.linsear_write_formula(empty_str)
 
     assert result == -1.0
 
 
 def test_difficult_words():
-    textstatsci.set_lang("en")
-    result = textstatsci.difficult_words(long_test)
+    scireadability.set_lang("en")
+    result = scireadability.difficult_words(long_test)
 
     assert result == 54
 
 
 def test_difficult_words_list():
-    textstatsci.set_lang("en")
-    result = textstatsci.difficult_words_list(short_test)
+    scireadability.set_lang("en")
+    result = scireadability.difficult_words_list(short_test)
 
     assert result == ["sunglasses"]
 
 
 def test_is_difficult_word():
-    textstatsci.set_lang("en")
-    result = textstatsci.is_difficult_word(difficult_word)
+    scireadability.set_lang("en")
+    result = scireadability.is_difficult_word(difficult_word)
 
     assert result is True
 
 
 def test_is_easy_word():
-    textstatsci.set_lang("en")
-    result = textstatsci.is_easy_word(easy_word)
+    scireadability.set_lang("en")
+    result = scireadability.is_easy_word(easy_word)
 
     assert result is True
 
 
 def test_dale_chall_readability_score():
-    textstatsci.set_lang("en")
-    score = textstatsci.dale_chall_readability_score(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.dale_chall_readability_score(long_test)
 
     assert score == 7.7779937381404185
 
-    score = textstatsci.dale_chall_readability_score(empty_str)
+    score = scireadability.dale_chall_readability_score(empty_str)
 
     assert score == 0.0
 
 
 def test_gunning_fog():
-    textstatsci.set_lang("en")
-    score = textstatsci.gunning_fog(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.gunning_fog(long_test)
 
     assert score == 11.118532574320051
 
     # FOG-PL
-    textstatsci.set_lang("pl_PL")
-    score_pl = textstatsci.gunning_fog(long_test)
+    scireadability.set_lang("pl_PL")
+    score_pl = scireadability.gunning_fog(long_test)
 
     assert score_pl == 9.82820999367489
 
 
 def test_lix():
-    textstatsci.set_lang("en")
-    score = textstatsci.lix(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.lix(long_test)
 
     assert score == 43.69086357947434
 
-    result = textstatsci.lix(empty_str)
+    result = scireadability.lix(empty_str)
 
     assert result == 0.0
 
 
 def test_rix():
-    textstatsci.set_lang("en")
-    score = textstatsci.rix(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.rix(long_test)
 
     assert score == 4.588235294117647
 
 
 def test_text_standard():
-    textstatsci.set_lang("en")
-    standard = textstatsci.text_standard(long_test)
+    scireadability.set_lang("en")
+    standard = scireadability.text_standard(long_test)
 
     assert standard == "10th and 11th grade"
 
-    standard = textstatsci.text_standard(short_test)
+    standard = scireadability.text_standard(short_test)
 
     assert standard == "1st and 2nd grade"
 
 
 def test_reading_time():
-    textstatsci.set_lang("en")
-    score = textstatsci.reading_time(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.reading_time(long_test)
 
     assert score == 25.67812
 
 
 def test_lru_caching():
-    textstatsci.set_lang("en")
+    scireadability.set_lang("en")
     # Clear any cache
-    textstatsci.sentence_count.cache_clear()
-    textstatsci.avg_sentence_length.cache_clear()
+    scireadability.sentence_count.cache_clear()
+    scireadability.avg_sentence_length.cache_clear()
 
     # Make a call that uses `sentence_count`
-    textstatsci.avg_sentence_length(long_test)
+    scireadability.avg_sentence_length(long_test)
 
     # Test that `sentence_count` was called
-    assert textstatsci.sentence_count.cache_info().misses == 1
+    assert scireadability.sentence_count.cache_info().misses == 1
 
     # Call `avg_sentence_length` again, but clear it's cache first
-    textstatsci.avg_sentence_length.cache_clear()
-    textstatsci.avg_sentence_length(long_test)
+    scireadability.avg_sentence_length.cache_clear()
+    scireadability.avg_sentence_length(long_test)
 
     # Test that `sentence_count` wasn't called again
-    assert textstatsci.sentence_count.cache_info().hits == 1
+    assert scireadability.sentence_count.cache_info().hits == 1
 
 
 def test_changing_lang_clears_cache():
-    textstatsci.set_lang("en")
+    scireadability.set_lang("en")
 
     # Clear any cache and call reading ease
-    textstatsci.flesch_reading_ease.cache_clear()
-    textstatsci.flesch_reading_ease(short_test)
+    scireadability.flesch_reading_ease.cache_clear()
+    scireadability.flesch_reading_ease(short_test)
 
     # Check the cache has only been missed once
-    assert textstatsci.flesch_reading_ease.cache_info().misses == 1
+    assert scireadability.flesch_reading_ease.cache_info().misses == 1
 
     # Change the language and recall reading ease
-    textstatsci.set_lang("fr")
-    textstatsci.flesch_reading_ease(short_test)
+    scireadability.set_lang("fr")
+    scireadability.flesch_reading_ease(short_test)
 
     # Check the cache hasn't been hit again
-    assert textstatsci.flesch_reading_ease.cache_info().misses == 1
+    assert scireadability.flesch_reading_ease.cache_info().misses == 1
 
 
 def test_unicode_support():
-    textstatsci.set_lang("en")
-    textstatsci.text_standard(
+    scireadability.set_lang("en")
+    scireadability.text_standard(
         "\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059")
 
-    textstatsci.text_standard("ありがとうございます")
+    scireadability.text_standard("ありがとうございます")
 
 
 def test_spache_readability():
-    textstatsci.set_lang("en")
-    spache = textstatsci.spache_readability(easy_text, False)
+    scireadability.set_lang("en")
+    spache = scireadability.spache_readability(easy_text, False)
 
     assert spache == 2
 
-    score = textstatsci.spache_readability(empty_str)
+    score = scireadability.spache_readability(empty_str)
 
     assert score == 0.0
 
 
 def test_dale_chall_readability_score_v2():
-    textstatsci.set_lang("en")
-    score = textstatsci.dale_chall_readability_score_v2(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.dale_chall_readability_score_v2(long_test)
 
     assert score == 7.013961480075902
 
 
 def test_fernandez_huerta():
-    textstatsci.set_lang("es")
-    score = textstatsci.fernandez_huerta(long_spanish_text)
+    scireadability.set_lang("es")
+    score = scireadability.fernandez_huerta(long_spanish_text)
 
     assert score == 65.96666666666667
 
-    score = textstatsci.fernandez_huerta(empty_str)
+    score = scireadability.fernandez_huerta(empty_str)
 
     assert score == 206.84
 
 
 def test_szigriszt_pazos():
-    textstatsci.set_lang("es")
-    score = textstatsci.szigriszt_pazos(long_spanish_text)
+    scireadability.set_lang("es")
+    score = scireadability.szigriszt_pazos(long_spanish_text)
 
     assert score == 62.16222222222224
 
-    score = textstatsci.szigriszt_pazos(empty_str)
+    score = scireadability.szigriszt_pazos(empty_str)
 
     assert score == 0.0
 
 
 def test_gutierrez_polini():
-    textstatsci.set_lang("es")
-    score = textstatsci.gutierrez_polini(easy_spanish_text)
+    scireadability.set_lang("es")
+    score = scireadability.gutierrez_polini(easy_spanish_text)
 
     assert score == 64.35000000000001
 
-    score = textstatsci.gutierrez_polini(empty_str)
+    score = scireadability.gutierrez_polini(empty_str)
 
     assert score == 0.0
 
 
 def test_crawford():
-    textstatsci.set_lang("es")
-    score = textstatsci.crawford(long_spanish_text)
+    scireadability.set_lang("es")
+    score = scireadability.crawford(long_spanish_text)
 
     assert score == 5.089296296296297
 
-    score = textstatsci.crawford(empty_str)
+    score = scireadability.crawford(empty_str)
 
     assert score == 0.0
 
 
 def test_wienersachtext_formula():
-    textstatsci.set_lang("de")
+    scireadability.set_lang("de")
     sample_text = 'Alle meine Entchen schwimmen auf dem See, \
     Köpfchen unters Wasser, Schwänzchen in die Höh.'
-    wstf = textstatsci.wiener_sachtextformel(sample_text, variant=1)
+    wstf = scireadability.wiener_sachtextformel(sample_text, variant=1)
 
     assert wstf == 3.8
 
     sample_text = 'Alle Parteien widmen dem Thema rein quantitativ \
     betrachtet nennenswerte Aufmerksamkeit, die Grünen wenig überraschend \
     am meisten.'
-    wstf = textstatsci.wiener_sachtextformel(sample_text, variant=1)
+    wstf = scireadability.wiener_sachtextformel(sample_text, variant=1)
 
     assert wstf == 13.9
 
 
 def test_gulpease_index():
-    textstatsci.set_lang("it")
-    score = textstatsci.gulpease_index(italian_text)
+    scireadability.set_lang("it")
+    score = scireadability.gulpease_index(italian_text)
 
     assert score == 40.111111111111114
 
 
 def test_default_lang_configs():
     # Config from default en should be used
-    textstatsci.set_lang("en_GB")
-    score = textstatsci.flesch_reading_ease(long_test)
+    scireadability.set_lang("en_GB")
+    score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 70.23247628083493
 
 
 def test_osman():
-    easy_score = textstatsci.osman(easy_arabic_text)
-    hard_score = textstatsci.osman(hard_arabic_text)
+    easy_score = scireadability.osman(easy_arabic_text)
+    hard_score = scireadability.osman(hard_arabic_text)
 
     assert easy_score == 102.18627777777778
     assert hard_score == 39.292019999999994
 
 
 def test_disabling_rounding():
-    textstatsci.set_lang("en")
-    textstatsci.set_rounding(False)
+    scireadability.set_lang("en")
+    scireadability.set_rounding(False)
 
-    index = textstatsci.spache_readability(long_test)
+    index = scireadability.spache_readability(long_test)
 
-    textstatsci.set_rounding(True)
+    scireadability.set_rounding(True)
 
     assert index == 5.172798861480075
 
 
 def test_changing_rounding_points():
-    textstatsci.set_lang("en")
-    textstatsci.set_rounding(True, points=5)
+    scireadability.set_lang("en")
+    scireadability.set_rounding(True, points=5)
 
-    index = textstatsci.spache_readability(long_test)
+    index = scireadability.spache_readability(long_test)
 
-    textstatsci.set_rounding(True)
+    scireadability.set_rounding(True)
 
     assert index == 5.1728
 
 
 def test_instanced_textstat_rounding():
-    textstatsci.set_lang("en")
+    scireadability.set_lang("en")
 
-    from textstatsci.textstatsci import textstatistics
+    from scireadability.scireadability import readability
 
-    my_textstat = textstatistics()
+    my_textstat = readability()
     my_textstat.set_rounding(False)
 
     my_not_rounded_index = my_textstat.spache_readability(long_test)
 
     assert my_not_rounded_index == 5.172798861480075
 
-    default_rounded_index = textstatsci.spache_readability(long_test)
+    default_rounded_index = scireadability.spache_readability(long_test)
 
     assert default_rounded_index == 5.17
 
 
 def test_mcalpine_eflaw():
-    textstatsci.set_lang("en")
-    score = textstatsci.mcalpine_eflaw(long_test)
+    scireadability.set_lang("en")
+    score = scireadability.mcalpine_eflaw(long_test)
 
     assert score == 30.8
 
 
 def test_miniword_count():
-    textstatsci.set_lang("en")
-    count = textstatsci.miniword_count(long_test)
+    scireadability.set_lang("en")
+    count = scireadability.miniword_count(long_test)
 
     assert count == 151
 
@@ -790,13 +790,13 @@ hard_academic_hungarian_text = (
 
 def test_char_count_hungarian():
     # Arrange
-    textstatsci.set_lang("hu_HU")
+    scireadability.set_lang("hu_HU")
     expected_easy_count = 43
     expected_easy_count_spaces = 54
 
     # Act
-    actual_count = textstatsci.char_count(easy_hungarian_text)
-    actual_count_spaces = textstatsci.char_count(
+    actual_count = scireadability.char_count(easy_hungarian_text)
+    actual_count_spaces = scireadability.char_count(
         easy_hungarian_text, ignore_spaces=False
     )
 
@@ -807,12 +807,12 @@ def test_char_count_hungarian():
 
 def test_letter_count_hungarian():
     # Arrange
-    textstatsci.set_lang("hu_HU")
+    scireadability.set_lang("hu_HU")
     expected_easy_count = 42
     expected_easy_count_spaces = 53
 
-    actual_count = textstatsci.letter_count(easy_hungarian_text)
-    actual_count_spaces = textstatsci.letter_count(
+    actual_count = scireadability.letter_count(easy_hungarian_text)
+    actual_count_spaces = scireadability.letter_count(
         easy_hungarian_text, ignore_spaces=False
     )
 
@@ -823,13 +823,13 @@ def test_letter_count_hungarian():
 
 def test_sentence_count_hungarian():
     # Arrange
-    textstatsci.set_lang('hu_HU')
+    scireadability.set_lang('hu_HU')
     expected_hard = 3
     expected_hard_academic = 6
 
     # Act
-    actual_hard = textstatsci.sentence_count(hard_hungarian_text)
-    actual_academic = textstatsci.sentence_count(hard_academic_hungarian_text)
+    actual_hard = scireadability.sentence_count(hard_hungarian_text)
+    actual_academic = scireadability.sentence_count(hard_academic_hungarian_text)
 
     # Assert
     assert actual_hard == expected_hard
@@ -838,15 +838,15 @@ def test_sentence_count_hungarian():
 
 def test_flesch_reading_ease_hungarian():
     # Arrange
-    textstatsci.set_lang("hu_HU")
+    scireadability.set_lang("hu_HU")
     expected_easy = 89.09
     expected_hard = 53.0
     expected_hard_academic = 22.02
 
     # Act
-    actual_easy = textstatsci.flesch_reading_ease(easy_hungarian_text2)
-    actual_hard = textstatsci.flesch_reading_ease(hard_hungarian_text)
-    actual_academic = textstatsci.flesch_reading_ease(
+    actual_easy = scireadability.flesch_reading_ease(easy_hungarian_text2)
+    actual_hard = scireadability.flesch_reading_ease(hard_hungarian_text)
+    actual_academic = scireadability.flesch_reading_ease(
         hard_academic_hungarian_text
     )
 
@@ -858,15 +858,15 @@ def test_flesch_reading_ease_hungarian():
 
 def test_smog_index_hungarian():
     # Arrange
-    textstatsci.set_lang("hu_HU")
+    scireadability.set_lang("hu_HU")
     expected_easy = 0
     expected_hard = 17.9
     expected_hard_academic = 21.9
 
     # Act
-    actual_easy = textstatsci.smog_index(easy_hungarian_text)
-    actual_hard = textstatsci.smog_index(hard_hungarian_text)
-    actual_academic = textstatsci.smog_index(hard_academic_hungarian_text)
+    actual_easy = scireadability.smog_index(easy_hungarian_text)
+    actual_hard = scireadability.smog_index(hard_hungarian_text)
+    actual_academic = scireadability.smog_index(hard_academic_hungarian_text)
 
     # Assert
     assert actual_easy == expected_easy
@@ -876,15 +876,15 @@ def test_smog_index_hungarian():
 
 def test_gunning_fog_hungarian():
     # Arrange
-    textstatsci.set_lang("hu_HU")
+    scireadability.set_lang("hu_HU")
     expected_easy = 2.6
     expected_hard = 9.71
     expected_hard_academic = 14.41
 
     # Act
-    actual_easy = textstatsci.gunning_fog(easy_hungarian_text2)
-    actual_hard = textstatsci.gunning_fog(hard_hungarian_text)
-    actual_academic = textstatsci.gunning_fog(hard_academic_hungarian_text)
+    actual_easy = scireadability.gunning_fog(easy_hungarian_text2)
+    actual_hard = scireadability.gunning_fog(hard_hungarian_text)
+    actual_academic = scireadability.gunning_fog(hard_academic_hungarian_text)
 
     # Assert
     assert actual_easy == expected_easy

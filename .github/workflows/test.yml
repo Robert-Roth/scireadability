@@ -1,4 +1,4 @@
-name: textstatsci
+name: scireadability
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Check code spelling
         run: |
-          pipenv run codespell -L paket --skip=./textstatsci/resources/**/easy_words.txt,./build/*,./textstatsci.egg-info/*,./.git/* --exclude-file=.codespellignorelines
+          pipenv run codespell -L paket --skip=./scireadability/resources/**/easy_words.txt,./build/*,./scireadability.egg-info/*,./.git/* --exclude-file=.codespellignorelines
 
       - name: Test with pytest
         run: |

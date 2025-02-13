@@ -2,13 +2,13 @@ from setuptools import setup
 from io import open
 
 setup(
-    name="textstatsci",
-    packages=["textstatsci"],
-    version="0.5.1",
+    name="scireadability",
+    packages=["scireadability"],
+    version="0.6.0",
     description="Calculate statistical features from text, mainly scientific literature",
     author="Shivam Bansal, Chaitanya Aggarwal, Robert Roth",
     author_email="rwroth5@gmail.com",
-    url="https://github.com/robert-roth/textstatsci",
+    url="https://github.com/robert-roth/scireadability",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     package_data={"": ["resources/en/easy_word_list.txt", "resources/en/custom_dict.json"]},

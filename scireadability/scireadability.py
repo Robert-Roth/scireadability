@@ -106,6 +106,7 @@ SPECIES_NAME_ADJUSTMENTS = {
     "odes": 1,
     "eae": 1,
     "oides": 1,
+    "alei": 1,
 }
 
 
@@ -118,8 +119,8 @@ def get_grade_suffix(grade: int) -> str:
     return teens_map.get(grade % 100, ordinal_map.get(grade % 10, 'th'))
 
 
-class textstatistics:
-    """Main textstatsci class with methods to calculate readability indices.
+class readability:
+    """Main scireadability class with methods to calculate readability indices.
 
     Attributes
     ----------
@@ -135,7 +136,7 @@ class textstatistics:
         round_points is set to None, the number of decimals will be determined
         by the argument passed to the method. Default: None
     __rm_apostrophe : bool
-        If True, all textstatsci methods that use the remove_punctuataion
+        If True, all scireadability methods that use the remove_punctuataion
         function for the word count, syllable count or character count,
         remove the apostrophe in contractions along with other punctuation.
         If False, punctuation is removed with the exception of apostrophes
@@ -228,9 +229,9 @@ class textstatistics:
         Parameters
         ----------
         rounding : bool
-            Whether to round the outputs of all textstatsci methods.
+            Whether to round the outputs of all scireadability methods.
         points : int or None, optional
-            The number of decimal digits for the outputs of all textstatsci
+            The number of decimal digits for the outputs of all scireadability
             methods. The default is None.
 
         Returns
@@ -247,7 +248,7 @@ class textstatistics:
         Parameters
         ----------
         rm_apostrophe : bool
-            If True, all textstatsci methods that use the remove_punctuataion
+            If True, all scireadability methods that use the remove_punctuataion
             function for the word count, syllable count or character count,
             remove the apostrophe in contractions along with other punctuation.
             If False, punctuation is removed with the exception of apostrophes
@@ -1195,10 +1196,10 @@ class textstatistics:
 
         `A` is obtained with `len(text.split())`, which counts
         contractions as one word. `A/B` is
-        calculated using the method `textstatsci.avg_sentence_length()`, which
+        calculated using the method `scireadability.avg_sentence_length()`, which
         counts contractions as two words, unless `__rm_apostrophe` is set to
         False. Therefore, the definition of a word is only consistent if you
-        call `textstatsci.set_rm_apostrophe(False)` before calculating the LIX.
+        call `scireadability.set_rm_apostrophe(False)` before calculating the LIX.
 
         """
         words = text.split()
@@ -1244,7 +1245,7 @@ class textstatistics:
 
         Anderson (1983) specifies that punctuation should be removed and that
         hyphenated sequences and abbreviations count as single words.
-        Therefore, make sure to call `textstatsci.set_rm_apostrophe(False)` before
+        Therefore, make sure to call `scireadability.set_rm_apostrophe(False)` before
         calculating the RIX.
 
         """
@@ -1595,7 +1596,7 @@ class textstatistics:
                 easy_word_set = {
                     ln.decode("utf-8").strip()
                     for ln in pkg_resources.resource_stream(
-                        "textstatsci",
+                        "scireadability",
                         f"resources/{lang}/easy_words.txt",
                     )
                 }
@@ -1608,11 +1609,11 @@ class textstatistics:
                 easy_word_set = {
                     ln.decode("utf-8").strip()
                     for ln in pkg_resources.resource_stream(
-                        "textstatsci", "resources/en/easy_words.txt"
+                        "scireadability", "resources/en/easy_words.txt"
                     )
                 }
             self.__easy_word_sets[lang] = easy_word_set
         return self.__easy_word_sets[lang]
 
 
-textstatsci = textstatistics()
+scireadability = readability()

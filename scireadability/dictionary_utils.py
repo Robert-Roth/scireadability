@@ -3,7 +3,7 @@ import json
 import os
 import pkg_resources
 
-PACKAGE_NAME = "textstatsci"
+PACKAGE_NAME = "scireadability"
 
 
 def _get_default_dict_path(lang="en"):

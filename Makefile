@@ -7,11 +7,11 @@ test:
 	pipenv run pytest test.py
 
 style:
-	pipenv run pycodestyle textstatsci/
+	pipenv run pycodestyle scireadability/
 	pipenv run pycodestyle test.py
 
 clean:
-	rm -rf build/ dist/ textstatsci.egg-info/ __pycache__/ */__pycache__/
+	rm -rf build/ dist/ scireadability.egg-info/ __pycache__/ */__pycache__/
 	rm -f *.pyc */*.pyc
 
 dist:
