@@ -411,25 +411,18 @@ class readability:
         return count
 
     @lru_cache(maxsize=128)
-    def syllable_count(self, text: str, lang: Union[str, None] = None) -> int:
-        """Calculate syllable words in a text using custom dictionary, then cmudict, and pyphen.
+    def syllable_count(self, text: str) -> int:
+        """Calculates syllables in words. Starts with custom dict, then cmudict, then regex for English.
 
         Parameters
         ----------
         text : str
             A text string.
-        lang : str or None
-            The language of the text.
-
-            .. deprecated:: 0.5.7
 
         Returns
         -------
         int
             Number of syllables in `text`."""
-
-        if lang:  # Remove in future versions
-            warnings.warn("The 'lang' argument is deprecated.", DeprecationWarning)
 
         if isinstance(text, bytes):
             text = text.decode(self.text_encoding)
