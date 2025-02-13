@@ -16,7 +16,7 @@ setup(
     install_requires=["pyphen", "cmudict", "setuptools", "appdirs"],
     license="MIT",
     python_requires=">=3.12",
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3 :: Only",
@@ -24,5 +24,5 @@ setup(
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
         "Topic :: Text Processing",
-    ),
+    ],
 )
