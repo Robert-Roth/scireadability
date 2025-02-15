@@ -1,7 +1,7 @@
 from .scireadability import scireadability
 
 
-__version__ = (0, 6, 3)
+__version__ = (0, 6, 4)
 
 
 for attribute in dir(scireadability):

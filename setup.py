@@ -4,7 +4,7 @@ from io import open
 setup(
     name="scireadability",
     packages=["scireadability"],
-    version="0.6.3",
+    version="0.6.4",
     description="Calculate statistical features from text, mainly scientific literature",
     author="Shivam Bansal, Chaitanya Aggarwal, Robert Roth",
     author_email="rwroth5@gmail.com",
@@ -16,6 +16,10 @@ setup(
     install_requires=["pyphen", "cmudict", "setuptools", "appdirs"],
     license="MIT",
     python_requires=">=3.10",
+    project_urls={
+        'Documentation': 'https://scireadability-rwroth5.pythonanywhere.com/about/',
+        'Demo': 'https://scireadability-rwroth5.pythonanywhere.com/analyze/',
+    },
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.12",
