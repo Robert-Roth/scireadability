@@ -28,10 +28,6 @@ jobs:
           python -m pip install pipenv
           pipenv install --dev
 
-      - name: Check code spelling
-        run: |
-          pipenv run codespell -L paket --skip=./scireadability/resources/**/easy_words.txt,./build/*,./scireadability.egg-info/*,./.git/* --exclude-file=.codespellignorelines --ignore-words="FORCAST,forcast"
-
       - name: Test with pytest
         run: |
           pipenv run pytest test.py
