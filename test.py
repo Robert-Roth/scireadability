@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 
-"""Test suite for scireadability"""
+"""Test suite for scireadability (English-Only Version)"""
 
 import json
 import os
@@ -135,116 +135,13 @@ easy_text = (
     "so nice on the wall."
 )
 
-long_spanish_text = (
-    "Muchos años después, frente al pelotón de fusilamiento, "
-    "el coronel Aureliano Buendía había de recordar aquella "
-    "tarde remota en que su padre lo llevó a conocer el hielo. "
-    "Macondo era entonces una aldea de veinte casas de barro y "
-    "cañabrava construidas a la orilla de un río de aguas "
-    "diáfanas que se precipitaban por un lecho de piedras pulidas, "
-    "blancas y enormes como huevos prehistóricos. El mundo era tan "
-    "reciente, que muchas cosas carecían de nombre, y para mencionarlas "
-    "había que señalarlas con el dedo. Todos los años, por el mes de marzo, "
-    "una familia de gitanos desarrapados plantaba su carpa cerca "
-    "de la aldea, y con un grande alboroto de pitos y timbales daban a "
-    "conocer los nuevos inventos. Primero llevaron el imán. "
-    "Un gitano corpulento, de barba montaraz y manos de gorrión, que se "
-    "presentó con el nombre de Melquíades, hizo una truculenta demostración "
-    "pública de lo que él mismo llamaba la octava maravilla de "
-    "los sabios alquimistas de Macedonia."
-)
-
-easy_spanish_text = "Hoy es un lindo día"
-
-long_russian_text_guillemets = (
-    "Игра ... игры всегда считались важными для развития "
-    "уравновешенных и творческих детей; однако, какую роль "
-    "они должны играть в жизни взрослых, если таковая имеется, "
-    "никогда не исследовалась так глубоко. Я считаю, "
-    "что игры для взрослых не менее важны, чем для детей. "
-    "Выделение времени для игр с нашими детьми и другими "
-    "взрослыми не только ценно для построения межличностных "
-    "отношений, но также является прекрасным способом снять "
-    "накопившееся напряжение.\n"
-    "Ничто не доставляет такого же удовольствие для моего мужа "
-    "после тяжелого рабочего дня, как прийти домой и поиграть "
-    "с кем-нибудь в шахматы. Это позволяет ему расслабиться от "
-    "повседневных дел и обсудить плюсы и минусы дня в спокойной "
-    "обстановке. Один из самых запоминающихся свадебных "
-    "подарков - набор нардов - получил близкий друг. Я спросила "
-    "его, зачем он сделал нам такой подарок. Он ответил, что "
-    "считает важным аспектом брака никогда не прекращать "
-    "совместные игры. По прошествии лет, когда я "
-    "начала покупать и проходить с другими парами и коллегами "
-    "многие игры, такие как: Monopoly, Chutes & Ladders, "
-    "Mastermind, Dweebs, Geeks, & Weirdos и т.д. Я сознаю их "
-    "неотъемлемую роль, которую они сыграли в наши выходные и "
-    "в наши недели аля «выключите телевизор и займитесь "
-    "чем-нибудь более стимулирующим». Они обогатили мою "
-    "жизнь и сделали ее интереснее. К сожалению, многие "
-    "взрослые забывают, что игры вообще существуют, а "
-    "прячут их в шкафы, о которых забывают, пока не придут "
-    "внуки.\n"
-    "Слишком часто взрослые настолько увлечены работой, чтобы "
-    "платить по счетам и не отставать от «Джонсов», что "
-    "пренебрегают радостью жизни; удовольствием, которое может "
-    "быть наградой за расслабляющую игру с другим человеком. "
-    "Было сказано, что «человек - это для того, чтобы иметь "
-    "радость», но слишком часто мы идем по жизни без особой "
-    "радости. Игры позволяют нам расслабиться, узнать что-то "
-    "новое и интересное, взаимодействовать с людьми на другом, "
-    "более комфортном уровне и наслаждаться безопасным "
-    "соревнованием. По этим причинам взрослые должны уделять "
-    "больше внимания играм в своей жизни"
-)
-
-italian_text = (
-    "Roma è un comune italiano, capitale della Repubblica Italiana, "
-    "nonché capoluogo dell'omonima città metropolitana e della regione Lazio."
-)
-
 difficult_word = "Regardless"
 easy_word = "Dog"
 
 empty_str = ""
 
-easy_arabic_text = "ذهب هند وأحمد الى المدرسة. هند تحب الرسم والمطالعة"
-hard_arabic_text = (
-    "\u062a\u062a\u0631\u0643\u0632 \u0623\u0633\u0633 \
-    \u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0646\u0648\u0648\u064a\u0629 \u0628\u0634\u0643\u0644 \
-    \u0639\u0627\u0645 \u0639\u0644\u064a \u0627\u0644\u0630\u0631\u0629 \
-    \u0648\u0645\u0643\u0648\u0646\u0627\u062a\u0647\u0627 \
-    \u0627\u0644\u062f\u0627\u062e\u0644\u064a\u0629 \
-    \u0648\u0627\u0644\u062a\u0639\u0627\u0645\u0644 \
-    \u0645\u0639 \u062a\u0644\u0643 \u0627\u0644\u0630\u0631\u0629 \
-    \u0648\u0627\u0644\u0639\u0646\u0627\u0635\u0631 \
-    \u0648\u062d\u064a\u062b \u0627\u0646 \u0647\u0630\u0627 \u0647\u0648 \
-    \u0627\u0644\u0645\u0628\u062d\u062b \u0627\u0644\u0639\u0627\u0645 \
-    \u0644\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0646\u0648\u0648\u064a\u0629 \u0641\u0627\u0646\u0647 \
-    \u0627\u062d\u064a\u0627\u0646\u0627 \u0645\u0627 \
-    \u064a\u0637\u0644\u0642 \u0639\u0644\u064a\u0647\u0627 \
-    \u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0630\u0631\u064a\u0629 \
-    \u0627\u0644\u0627 \u0623\u0646 \u0645\u062c\u0627\u0644 \
-    \u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0646\u0648\u0648\u064a\u0629 \
-    \u0623\u0639\u0645 \u0648\u0627\u0634\u0645\u0644 \u0645\u0646 \
-    \u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0630\u0631\u064a\u0629 \u0648\u0643\u0630\u0644\u0643 \
-    \u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621 \
-    \u0627\u0644\u0630\u0631\u064a\u0629 \u062a\u0647\u062a\u0645 \
-    \u0628\u062f\u0627\u0631\u0633\u0629 \
-    \u0627\u0644\u0630\u0631\u0629 \u0641\u0649 \
-    \u062d\u0627\u0644\u0627\u062a\u0647\u0627 \
-    \u0648\u062a\u0641\u0627\u0639\u0644\u0627\u062a\u0647\u0627 \
-    \u0627\u0644\u0645\u062e\u062a\u0644\u0641\u0629"
-)
-
 
 def test_char_count():
-    scireadability.set_lang("en")
     count = scireadability.char_count(long_test)
     count_spaces = scireadability.char_count(
         long_test, ignore_spaces=False
@@ -255,7 +152,6 @@ def test_char_count():
 
 
 def test_letter_count():
-    scireadability.set_lang("en")
     count = scireadability.letter_count(long_test)
     count_spaces = scireadability.letter_count(
         long_test, ignore_spaces=False
@@ -266,7 +162,6 @@ def test_letter_count():
 
 
 def test_remove_punctuation_incl_apostrophe():
-    scireadability.set_lang('en')
     scireadability.set_rm_apostrophe(True)
     text = scireadability.remove_punctuation(punct_text)
 
@@ -277,7 +172,6 @@ def test_remove_punctuation_incl_apostrophe():
 
 
 def test_remove_punctuation_excl_apostrophe():
-    scireadability.set_lang('en')
     scireadability.set_rm_apostrophe(False)
     text = scireadability.remove_punctuation(punct_text)
 
@@ -285,7 +179,6 @@ def test_remove_punctuation_excl_apostrophe():
 
 
 def test_lexicon_count():
-    scireadability.set_lang("en")
     count = scireadability.lexicon_count(long_test)
     count_punc = scireadability.lexicon_count(long_test, removepunct=False)
 
@@ -294,39 +187,38 @@ def test_lexicon_count():
 
 
 @pytest.mark.parametrize(
-    "lang,text,n_syllables,margin",
+    "text,n_syllables,margin",
     [
-        ("en", short_test, 7, 0),
-        ("en", punct_text, 74, 2),
-        ("en", "faeries", 2, 1),
-        ("en", "relived", 2, 0),
-        ("en", "couple", 2, 0),
-        ("en", "enriched", 2, 0),
-        ("en", "us", 1, 0),
-        ("en", "too", 1, 0),
-        ("en", "monopoly", 4, 0),
-        ("en", "him", 1, 0),
-        ("en", "he", 1, 0),
-        ("en", "without", 2, 0),
-        ("en", "creative", 3, 0),
-        ("en", "every", 3, 0),
-        ("en", "stimulating", 4, 0),
-        ("en", "life", 1, 0),
-        ("en", "cupboards", 2, 0),
-        ("en", "day's", 1, 0),
-        ("en", "forgotten", 3, 0),
-        ("en", "through", 1, 0),
-        ("en", "marriage", 2, 0),
-        ("en", "hello", 2, 0),
-        ("en", "the", 1, 0),
-        ("en", "sentences", 3, 0),
-        ("en", "songwriter", 3, 0),
-        ("en", "removing", 3, 0),
-        ("en", "interpersonal", 5, 0),
+        (short_test, 7, 0),
+        (punct_text, 74, 2),
+        ("faeries", 2, 1),
+        ("relived", 2, 0),
+        ("couple", 2, 0),
+        ("enriched", 2, 0),
+        ("us", 1, 0),
+        ("too", 1, 0),
+        ("monopoly", 4, 0),
+        ("him", 1, 0),
+        ("he", 1, 0),
+        ("without", 2, 0),
+        ("creative", 3, 0),
+        ("every", 3, 0),
+        ("stimulating", 4, 0),
+        ("life", 1, 0),
+        ("cupboards", 2, 0),
+        ("day's", 1, 0),
+        ("forgotten", 3, 0),
+        ("through", 1, 0),
+        ("marriage", 2, 0),
+        ("hello", 2, 0),
+        ("the", 1, 0),
+        ("sentences", 3, 0),
+        ("songwriter", 3, 0),
+        ("removing", 3, 0),
+        ("interpersonal", 5, 0),
     ]
 )
-def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
-    scireadability.set_lang(lang)
+def test_syllable_count(text: str, n_syllables: int, margin: int):
     count = scireadability.syllable_count(text)
     diff = abs(count - n_syllables)
 
@@ -334,121 +226,72 @@ def test_syllable_count(lang: str, text: str, n_syllables: int, margin: int):
 
 
 def test_sentence_count():
-    scireadability.set_lang("en")
     count = scireadability.sentence_count(long_test)
 
     assert count == 17
 
 
-def test_sentence_count_russian():
-    scireadability.set_lang('ru_RU')
-    count = scireadability.sentence_count(long_russian_text_guillemets)
-
-    assert count == 16
-
-
 def test_avg_sentence_length():
-    scireadability.set_lang("en")
     avg = scireadability.avg_sentence_length(long_test)
 
     assert avg == 21.88235294117647
 
 
 def test_avg_syllables_per_word():
-    scireadability.set_lang("en")
     avg = scireadability.avg_syllables_per_word(long_test)
 
     assert avg == 1.4758064516129032
 
 
 def test_avg_letter_per_word():
-    scireadability.set_lang("en")
     avg = scireadability.avg_letter_per_word(long_test)
 
     assert avg == 4.532258064516129
 
 
 def test_avg_sentence_per_word():
-    scireadability.set_lang("en")
     avg = scireadability.avg_sentence_per_word(long_test)
 
     assert avg == 0.0456989247311828
 
 
 def test_flesch_reading_ease():
-    scireadability.set_lang("en")
     score = scireadability.flesch_reading_ease(long_test)
 
     assert score == 59.77118595825428
 
-    scireadability.set_lang("de_DE")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 66.27893738140419
-
-    scireadability.set_lang("es_ES")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 86.77806451612905
-
-    scireadability.set_lang("fr_FR")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 82.30339025932953
-
-    scireadability.set_lang("it_IT")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 91.61745730550285
-
-    scireadability.set_lang("nl_NL")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 66.01666982922202
-
-    scireadability.set_lang("ru_RU")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 118.28794117647061
-
 
 def test_flesch_kincaid_grade():
-    scireadability.set_lang("en")
     score = scireadability.flesch_kincaid_grade(long_test)
 
     assert score == 10.358633776091082
 
 
 def test_polysyllabcount():
-    scireadability.set_lang("en")
     count = scireadability.polysyllabcount(long_test)
 
     assert count == 38
 
 
 def test_smog_index():
-    scireadability.set_lang("en")
     index = scireadability.smog_index(long_test)
 
     assert index == 11.670169846198839
 
 
 def test_coleman_liau_index():
-    scireadability.set_lang("en")
     index = scireadability.coleman_liau_index(long_test)
 
     assert index == 9.13440860215054
 
 
 def test_automated_readability_index():
-    scireadability.set_lang("en")
     index = scireadability.automated_readability_index(long_test)
 
     assert index == 11.643111954459208
 
 
 def test_linsear_write_formula():
-    scireadability.set_lang("en")
     result = scireadability.linsear_write_formula(long_test)
 
     assert result == 15.25
@@ -459,35 +302,30 @@ def test_linsear_write_formula():
 
 
 def test_difficult_words():
-    scireadability.set_lang("en")
     result = scireadability.difficult_words(long_test)
 
     assert result == 54
 
 
 def test_difficult_words_list():
-    scireadability.set_lang("en")
     result = scireadability.difficult_words_list(short_test)
 
     assert result == ["sunglasses"]
 
 
 def test_is_difficult_word():
-    scireadability.set_lang("en")
     result = scireadability.is_difficult_word(difficult_word)
 
     assert result is True
 
 
 def test_is_easy_word():
-    scireadability.set_lang("en")
     result = scireadability.is_easy_word(easy_word)
 
     assert result is True
 
 
 def test_dale_chall_readability_score():
-    scireadability.set_lang("en")
     score = scireadability.dale_chall_readability_score(long_test)
 
     assert score == 7.7779937381404185
@@ -498,20 +336,12 @@ def test_dale_chall_readability_score():
 
 
 def test_gunning_fog():
-    scireadability.set_lang("en")
     score = scireadability.gunning_fog(long_test)
 
     assert score == 11.118532574320051
 
-    # FOG-PL
-    scireadability.set_lang("pl_PL")
-    score_pl = scireadability.gunning_fog(long_test)
-
-    assert score_pl == 9.82820999367489
-
 
 def test_lix():
-    scireadability.set_lang("en")
     score = scireadability.lix(long_test)
 
     assert score == 43.69086357947434
@@ -522,14 +352,12 @@ def test_lix():
 
 
 def test_rix():
-    scireadability.set_lang("en")
     score = scireadability.rix(long_test)
 
     assert score == 4.588235294117647
 
 
 def test_text_standard():
-    scireadability.set_lang("en")
     standard = scireadability.text_standard(long_test)
 
     assert standard == "10th and 11th grade"
@@ -540,14 +368,12 @@ def test_text_standard():
 
 
 def test_reading_time():
-    scireadability.set_lang("en")
     score = scireadability.reading_time(long_test)
 
     assert score == 25.67812
 
 
 def test_lru_caching():
-    scireadability.set_lang("en")
     # Clear any cache
     scireadability.sentence_count.cache_clear()
     scireadability.avg_sentence_length.cache_clear()
@@ -566,26 +392,22 @@ def test_lru_caching():
     assert scireadability.sentence_count.cache_info().hits == 1
 
 
-def test_changing_lang_clears_cache():
-    scireadability.set_lang("en")
+def test_cache_clearing():
+    # Instead of calling _cache_clear directly, clear specific caches we need to test
+    scireadability.flesch_reading_ease_core.cache_clear()
 
-    # Clear any cache and call reading ease
-    scireadability.flesch_reading_ease.cache_clear()
+    # Make a call to populate cache
     scireadability.flesch_reading_ease(short_test)
 
     # Check the cache has only been missed once
-    assert scireadability.flesch_reading_ease.cache_info().misses == 1
+    assert scireadability.flesch_reading_ease_core.cache_info().misses == 1
 
-    # Change the language and recall reading ease
-    scireadability.set_lang("fr")
+    # Verify cache is used on second call
     scireadability.flesch_reading_ease(short_test)
-
-    # Check the cache hasn't been hit again
-    assert scireadability.flesch_reading_ease.cache_info().misses == 1
+    assert scireadability.flesch_reading_ease_core.cache_info().hits >= 1
 
 
 def test_unicode_support():
-    scireadability.set_lang("en")
     scireadability.text_standard(
         "\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059")
 
@@ -593,7 +415,6 @@ def test_unicode_support():
 
 
 def test_spache_readability():
-    scireadability.set_lang("en")
     spache = scireadability.spache_readability(easy_text, False)
 
     assert spache == 2
@@ -604,426 +425,143 @@ def test_spache_readability():
 
 
 def test_dale_chall_readability_score_v2():
-    scireadability.set_lang("en")
     score = scireadability.dale_chall_readability_score_v2(long_test)
 
     assert score == 7.013961480075902
 
 
-def test_fernandez_huerta():
-    scireadability.set_lang("es")
-    score = scireadability.fernandez_huerta(long_spanish_text)
-
-    assert score == 65.96666666666667
-
-    score = scireadability.fernandez_huerta(empty_str)
-
-    assert score == 206.84
-
-
-def test_szigriszt_pazos():
-    scireadability.set_lang("es")
-    score = scireadability.szigriszt_pazos(long_spanish_text)
-
-    assert score == 62.16222222222224
-
-    score = scireadability.szigriszt_pazos(empty_str)
-
-    assert score == 0.0
-
-
-def test_gutierrez_polini():
-    scireadability.set_lang("es")
-    score = scireadability.gutierrez_polini(easy_spanish_text)
-
-    assert score == 64.35000000000001
-
-    score = scireadability.gutierrez_polini(empty_str)
-
-    assert score == 0.0
-
-
-def test_crawford():
-    scireadability.set_lang("es")
-    score = scireadability.crawford(long_spanish_text)
-
-    assert score == 5.089296296296297
-
-    score = scireadability.crawford(empty_str)
-
-    assert score == 0.0
-
-
-def test_wienersachtext_formula():
-    scireadability.set_lang("de")
-    sample_text = 'Alle meine Entchen schwimmen auf dem See, \
-    Köpfchen unters Wasser, Schwänzchen in die Höh.'
-    wstf = scireadability.wiener_sachtextformel(sample_text, variant=1)
-
-    assert wstf == 3.8
-
-    sample_text = 'Alle Parteien widmen dem Thema rein quantitativ \
-    betrachtet nennenswerte Aufmerksamkeit, die Grünen wenig überraschend \
-    am meisten.'
-    wstf = scireadability.wiener_sachtextformel(sample_text, variant=1)
-
-    assert wstf == 13.9
-
-
-def test_gulpease_index():
-    scireadability.set_lang("it")
-    score = scireadability.gulpease_index(italian_text)
-
-    assert score == 40.111111111111114
-
-
-def test_default_lang_configs():
-    # Config from default en should be used
-    scireadability.set_lang("en_GB")
-    score = scireadability.flesch_reading_ease(long_test)
-
-    assert score == 70.23247628083493
-
-
-def test_osman():
-    easy_score = scireadability.osman(easy_arabic_text)
-    hard_score = scireadability.osman(hard_arabic_text)
-
-    assert easy_score == 102.18627777777778
-    assert hard_score == 39.292019999999994
-
-
-def test_disabling_rounding():
-    scireadability.set_lang("en")
-    scireadability.set_rounding(False)
-
-    index = scireadability.spache_readability(long_test)
-
-    scireadability.set_rounding(True)
-
-    assert index == 5.172798861480075
-
-
-def test_changing_rounding_points():
-    scireadability.set_lang("en")
-    scireadability.set_rounding(True, points=5)
-
-    index = scireadability.spache_readability(long_test)
-
-    scireadability.set_rounding(True)
-
-    assert index == 5.1728
-
-
-def test_instanced_textstat_rounding():
-    scireadability.set_lang("en")
-
-    from scireadability.scireadability import readability
-
-    my_textstat = readability()
-    my_textstat.set_rounding(False)
-
-    my_not_rounded_index = my_textstat.spache_readability(long_test)
-
-    assert my_not_rounded_index == 5.172798861480075
-
-    default_rounded_index = scireadability.spache_readability(long_test)
-
-    assert default_rounded_index == 5.17
-
-
 def test_mcalpine_eflaw():
-    scireadability.set_lang("en")
     score = scireadability.mcalpine_eflaw(long_test)
 
     assert score == 30.8
 
 
 def test_miniword_count():
-    scireadability.set_lang("en")
     count = scireadability.miniword_count(long_test)
 
     assert count == 151
 
 
-# Hungarian tests
-
-easy_hungarian_text = "A ló zabot eszik és én a csillagos ég alatt alszom ma."
-
-easy_hungarian_text2 = """
-    Mondok neked egy nyelvtani fejtöröt.Melyik több?
-    Hat tucat tucat vagy fél tucat tucat?
-    """
-
-hard_hungarian_text = (
-    """
-    A mai fagylalt elődjének számító hideg édességet több ezer éve
-    készítettek először. Egyes feljegyzések szerint az ó kori kínaiak a
-    mézzel édesített gyümölcsleveket hóval, jéggel hűtötték, és ezen hideg
-    édességeket szolgálták fel a kiváltságosoknak. Annyi bizonyos, hogy a
-    római császárok kedvelt csemegéi voltak a hegyekből hozatott hóval
-    kevert gyümölcs levek, melyek sűrűn folyó, hideg, fagylaltszerű
-    italkülönlegességet eredményeztek.
-    """
-)
-
-hard_academic_hungarian_text = (
-    """
-    Az Amerikai Egyesült Államokban már a múlt század közepétől
-    alkalmazzák az angol nyelv matematikai elemzésére szolgáló olvashatósági
-    formulákat. Ezek közül hármat a neveléstudomány is használ a tengerentúli
-    oktatásban,a különböző rendeltetési célú szövegek elemzésére. A
-    vizsgálatok célja az, hogy meghatározzák a tanítási folyamatban használt
-    könyvek és tankönyvek érthető megfogalmazásának korcsoport vagy iskolai
-    osztályok alapján besorolható szintjét. Figyelembe véve az elméleti
-    hátteret, magyar szövegeken is teszteltük a formulákat, hogy
-    megállapítsuk, érvényesek-e az angol nyelvű szövegek következtetései.
-    Az olvashatósági tesztek eredeti célja meghatározni azt a fogalmazási
-    szintet, amely a legtöbb embernek érthető, és elkerüli az
-    olvasásértelmezést zavaró szakkifejezéseket, illetve bonyolult szavak
-    alkalmazását. Az 1920-as évektől kezdődően Edward Thorndike a tankönyvek
-    olvasásának nehézségi fokát vizsgálta, és különböző szószedeteket
-    javasolt iskolai használatra, az életkornak és az iskolai évfolyamoknak
-    megfelelően."""
-)
-
-
-def test_char_count_hungarian():
-    # Arrange
-    scireadability.set_lang("hu_HU")
-    expected_easy_count = 43
-    expected_easy_count_spaces = 54
-
-    # Act
-    actual_count = scireadability.char_count(easy_hungarian_text)
-    actual_count_spaces = scireadability.char_count(
-        easy_hungarian_text, ignore_spaces=False
-    )
-
-    # Assert
-    assert actual_count == expected_easy_count
-    assert actual_count_spaces == expected_easy_count_spaces
-
-
-def test_letter_count_hungarian():
-    # Arrange
-    scireadability.set_lang("hu_HU")
-    expected_easy_count = 42
-    expected_easy_count_spaces = 53
-
-    actual_count = scireadability.letter_count(easy_hungarian_text)
-    actual_count_spaces = scireadability.letter_count(
-        easy_hungarian_text, ignore_spaces=False
-    )
-
-    # Assert
-    assert actual_count == expected_easy_count
-    assert actual_count_spaces == expected_easy_count_spaces
-
-
-def test_sentence_count_hungarian():
-    # Arrange
-    scireadability.set_lang('hu_HU')
-    expected_hard = 3
-    expected_hard_academic = 6
-
-    # Act
-    actual_hard = scireadability.sentence_count(hard_hungarian_text)
-    actual_academic = scireadability.sentence_count(hard_academic_hungarian_text)
-
-    # Assert
-    assert actual_hard == expected_hard
-    assert actual_academic == expected_hard_academic
-
-
-def test_flesch_reading_ease_hungarian():
-    # Arrange
-    scireadability.set_lang("hu_HU")
-    expected_easy = 89.09
-    expected_hard = 53.0
-    expected_hard_academic = 22.02
-
-    # Act
-    actual_easy = scireadability.flesch_reading_ease(easy_hungarian_text2)
-    actual_hard = scireadability.flesch_reading_ease(hard_hungarian_text)
-    actual_academic = scireadability.flesch_reading_ease(
-        hard_academic_hungarian_text
-    )
-
-    # Assert
-    assert actual_easy == expected_easy
-    assert actual_hard == expected_hard
-    assert actual_academic == expected_hard_academic
-
-
-def test_smog_index_hungarian():
-    # Arrange
-    scireadability.set_lang("hu_HU")
-    expected_easy = 0
-    expected_hard = 17.9
-    expected_hard_academic = 21.9
-
-    # Act
-    actual_easy = scireadability.smog_index(easy_hungarian_text)
-    actual_hard = scireadability.smog_index(hard_hungarian_text)
-    actual_academic = scireadability.smog_index(hard_academic_hungarian_text)
-
-    # Assert
-    assert actual_easy == expected_easy
-    assert actual_hard == expected_hard
-    assert actual_academic == expected_hard_academic
-
-
-def test_gunning_fog_hungarian():
-    # Arrange
-    scireadability.set_lang("hu_HU")
-    expected_easy = 2.6
-    expected_hard = 9.71
-    expected_hard_academic = 14.41
-
-    # Act
-    actual_easy = scireadability.gunning_fog(easy_hungarian_text2)
-    actual_hard = scireadability.gunning_fog(hard_hungarian_text)
-    actual_academic = scireadability.gunning_fog(hard_academic_hungarian_text)
-
-    # Assert
-    assert actual_easy == expected_easy
-    assert actual_hard == expected_hard
-    assert actual_academic == expected_hard_academic
-
 # --- Tests for load_custom_syllable_dict ---
 def test_load_custom_syllable_dict_user_dict_exists_valid_json(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     user_dict_content = {"CUSTOM_SYLLABLE_DICT": {"testword": 3}}
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
     with open(user_dict_path, 'w', encoding='utf-8') as f:
         json.dump(user_dict_content, f)
 
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == user_dict_content["CUSTOM_SYLLABLE_DICT"]
 
 
 def test_load_custom_syllable_dict_user_dict_not_exists_default_exists_valid(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
     default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump(default_dict_content, f)
 
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"]
 
 
 def test_load_custom_syllable_dict_user_dict_not_exists_default_not_exists(test_env):
-    lang = "en"
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == {}
 
 
 def test_load_custom_syllable_dict_user_dict_not_exists_default_exists_invalid_json(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     # No need to create dirs here, fixture does it now
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         f.write("invalid json")
 
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == {}
 
 
 # --- Tests for overwrite_custom_dict ---
 def test_overwrite_custom_dict_valid_json_file(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     new_dict_content = {"CUSTOM_SYLLABLE_DICT": {"newword": 4, "anotherword": 5}}
     test_json_file = os.path.join(test_config_dir, "test_dict.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(new_dict_content, f)
 
-    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.overwrite_custom_dict(test_json_file)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
 
     assert loaded_dict == new_dict_content["CUSTOM_SYLLABLE_DICT"]
 
 
 def test_overwrite_custom_dict_file_not_found(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     non_existent_file = os.path.join(test_config_dir, "nonexistent.json")
     with pytest.raises(FileNotFoundError):
-        dictionary_utils.overwrite_custom_dict(non_existent_file, lang)
+        dictionary_utils.overwrite_custom_dict(non_existent_file)
 
 
 def test_overwrite_custom_dict_invalid_json_file(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     invalid_json_file = os.path.join(test_config_dir, "invalid.json")
     with open(invalid_json_file, 'w', encoding='utf-8') as f:
         f.write("invalid json")
 
     with pytest.raises(json.JSONDecodeError):
-        dictionary_utils.overwrite_custom_dict(invalid_json_file, lang)
+        dictionary_utils.overwrite_custom_dict(invalid_json_file)
 
 
 def test_overwrite_custom_dict_invalid_dict_format(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     invalid_format_file = os.path.join(test_config_dir, "badformat.json")
     bad_format_content = {"WRONG_KEY": {"word": 1}}
     with open(invalid_format_file, 'w', encoding='utf-8') as f:
         json.dump(bad_format_content, f)
 
     with pytest.raises(ValueError):
-        dictionary_utils.overwrite_custom_dict(invalid_format_file, lang)
+        dictionary_utils.overwrite_custom_dict(invalid_format_file)
 
 
 # --- Tests for add_term_to_custom_dict ---
 def test_add_term_to_custom_dict_valid_term(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     word_to_add = "testterm"
     syllable_count = 4
 
-    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count, lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
 
     assert word_to_add in loaded_dict
     assert loaded_dict[word_to_add] == syllable_count
 
 
 def test_add_term_to_custom_dict_invalid_syllable_count_zero(test_env):
-    lang = "en"
     with pytest.raises(ValueError):
-        dictionary_utils.add_term_to_custom_dict("word", 0, lang)
+        dictionary_utils.add_term_to_custom_dict("word", 0)
 
 
 def test_add_term_to_custom_dict_invalid_syllable_count_negative(test_env):
-    lang = "en"
     with pytest.raises(ValueError):
-        dictionary_utils.add_term_to_custom_dict("word", -1, lang)
+        dictionary_utils.add_term_to_custom_dict("word", -1)
 
 
 def test_add_term_to_custom_dict_invalid_syllable_count_not_int(test_env):
-    lang = "en"
     with pytest.raises(ValueError):
-        dictionary_utils.add_term_to_custom_dict("word", "not_an_int", lang)
+        dictionary_utils.add_term_to_custom_dict("word", "not_an_int")
 
 
 # --- Tests for add_terms_from_file ---
 def test_add_terms_from_file_valid_json_file(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     new_terms_content = {"CUSTOM_SYLLABLE_DICT": {"fileword1": 2, "fileword2": 3}}
     test_json_file = os.path.join(test_config_dir, "terms.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(new_terms_content, f)
 
-    dictionary_utils.add_terms_from_file(test_json_file, lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.add_terms_from_file(test_json_file)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
 
     for word, count in new_terms_content["CUSTOM_SYLLABLE_DICT"].items():
         assert word in loaded_dict
@@ -1032,128 +570,119 @@ def test_add_terms_from_file_valid_json_file(test_env):
 
 def test_add_terms_from_file_file_not_found(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     non_existent_file = os.path.join(test_config_dir, "nonexistent_terms.json")
     with pytest.raises(FileNotFoundError):
-        dictionary_utils.add_terms_from_file(non_existent_file, lang)
+        dictionary_utils.add_terms_from_file(non_existent_file)
 
 
 def test_add_terms_from_file_invalid_json_file(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     invalid_json_file = os.path.join(test_config_dir, "invalid_terms.json")
     with open(invalid_json_file, 'w', encoding='utf-8') as f:
         f.write("invalid json")
 
     with pytest.raises(json.JSONDecodeError):
-        dictionary_utils.add_terms_from_file(invalid_json_file, lang)
+        dictionary_utils.add_terms_from_file(invalid_json_file)
 
 
 def test_add_terms_from_file_invalid_dict_format(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     invalid_format_file = os.path.join(test_config_dir, "badformat_terms.json")
     bad_format_content = {"WRONG_KEY": {"word": 1}}
     with open(invalid_format_file, 'w', encoding='utf-8') as f:
         json.dump(bad_format_content, f)
 
     with pytest.raises(ValueError):
-        dictionary_utils.add_terms_from_file(invalid_format_file, lang)
+        dictionary_utils.add_terms_from_file(invalid_format_file)
 
 
 # --- Tests for revert_custom_dict_to_default ---
 def test_revert_custom_dict_to_default_user_dict_exists(test_env):
     test_config_dir, test_resources_dir = test_env
-    lang = "en"
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
     with open(user_dict_path, 'w', encoding='utf-8') as f:
         json.dump({"CUSTOM_SYLLABLE_DICT": {"userword": 100}}, f)
 
     default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     # No need to create dirs here, fixture does it now
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump(default_dict_content, f)
 
-    dictionary_utils.revert_custom_dict_to_default(lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.revert_custom_dict_to_default()
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
 
     assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"]
 
 
 def test_revert_custom_dict_to_default_default_dict_not_found(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     default_dict_file = os.path.join(test_resources_dir, default_dict_path)
     if os.path.exists(default_dict_file):
         os.remove(default_dict_file)
-    os.makedirs(os.path.dirname(default_dict_file), exist_ok=True) # Ensure lang dir exists
+    os.makedirs(os.path.dirname(default_dict_file), exist_ok=True) # Ensure en dir exists
 
     with pytest.raises(FileNotFoundError):
-        dictionary_utils.revert_custom_dict_to_default(lang)
+        dictionary_utils.revert_custom_dict_to_default()
 
 
 def test_revert_custom_dict_to_default_invalid_json_in_default(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     # No need to create dirs here, fixture does it now
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         f.write("invalid json")
 
     with pytest.raises(json.JSONDecodeError):
-        dictionary_utils.revert_custom_dict_to_default(lang)
+        dictionary_utils.revert_custom_dict_to_default()
+
 
 def test_load_custom_syllable_dict_case_sensitivity(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
     default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"TestWord": 2}} # Mixed case in default
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump(default_dict_content, f)
 
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert "testword" in loaded_dict # Assert lowercase lookup works (case-insensitive loading is assumed)
     assert loaded_dict["testword"] == 2 # Check correct count
 
 
 def test_load_custom_syllable_dict_empty_default_dict_file(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump({}, f) # Empty JSON as default
 
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == {} # Should load as empty dict
 
 
 # --- Additional Tests for overwrite_custom_dict ---
 def test_overwrite_custom_dict_large_json_file(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     large_dict_content = {"CUSTOM_SYLLABLE_DICT": {f"word_{i}": i % 5 + 1 for i in range(1000)}}
     test_json_file = os.path.join(test_config_dir, "large_dict.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(large_dict_content, f)
 
-    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.overwrite_custom_dict(test_json_file)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == large_dict_content["CUSTOM_SYLLABLE_DICT"] # Verify content
 
 
 def test_overwrite_custom_dict_verify_file_content(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     new_dict_content = {"CUSTOM_SYLLABLE_DICT": {"filecheckword": 3}}
     test_json_file = os.path.join(test_config_dir, "temp_dict.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(new_dict_content, f)
 
-    dictionary_utils.overwrite_custom_dict(test_json_file, lang)
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    dictionary_utils.overwrite_custom_dict(test_json_file)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     with open(user_dict_path, 'r', encoding='utf-8') as f:
         file_dict_content = json.load(f)
     assert file_dict_content == new_dict_content # Verify file content directly
@@ -1162,88 +691,310 @@ def test_overwrite_custom_dict_verify_file_content(test_env):
 # --- Additional Tests for add_term_to_custom_dict ---
 def test_add_term_to_custom_dict_existing_term_same_count(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     word_to_add = "existingword"
     syllable_count = 2
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
     with open(user_dict_path, 'w', encoding='utf-8') as f:
         json.dump({"CUSTOM_SYLLABLE_DICT": {word_to_add: syllable_count}}, f) # Dict exists with word
 
-    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count, lang) # Add again with same count
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.add_term_to_custom_dict(word_to_add, syllable_count) # Add again with same count
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict[word_to_add] == syllable_count # Count should remain the same
+
 
 def test_add_term_to_custom_dict_existing_term_different_count(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     word_to_add = "existingword"
     initial_syllable_count = 2
     new_syllable_count = 3
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
     with open(user_dict_path, 'w', encoding='utf-8') as f:
         json.dump({"CUSTOM_SYLLABLE_DICT": {word_to_add: initial_syllable_count}}, f) # Dict exists with word
 
-    dictionary_utils.add_term_to_custom_dict(word_to_add, new_syllable_count, lang) # Add again with different count
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.add_term_to_custom_dict(word_to_add, new_syllable_count) # Add again with different count
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict[word_to_add] == new_syllable_count # Count should be updated/overwritten
 
 
 # --- Additional Tests for add_terms_from_file ---
 def test_add_terms_from_file_empty_custom_syllable_dict_key(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     empty_dict_file_content = {"CUSTOM_SYLLABLE_DICT": {}} # Empty dict for the key
     test_json_file = os.path.join(test_config_dir, "empty_dict_terms.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(empty_dict_file_content, f)
 
-    dictionary_utils.add_terms_from_file(test_json_file, lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.add_terms_from_file(test_json_file)
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == {} # Should remain or become empty
 
 
 def test_add_terms_from_file_non_dict_value_for_custom_syllable_dict(test_env):
     test_config_dir, _ = test_env
-    lang = "en"
     non_dict_file_content = {"CUSTOM_SYLLABLE_DICT": ["not", "a", "dict"]} # List instead of dict
     test_json_file = os.path.join(test_config_dir, "non_dict_terms.json")
     with open(test_json_file, 'w', encoding='utf-8') as f:
         json.dump(non_dict_file_content, f)
 
     with pytest.raises(ValueError):
-        dictionary_utils.add_terms_from_file(test_json_file, lang)
+        dictionary_utils.add_terms_from_file(test_json_file)
 
 
 # --- Additional Tests for revert_custom_dict_to_default ---
 def test_revert_custom_dict_to_default_no_user_dict_exists(test_env):
     test_config_dir, test_resources_dir = test_env
-    lang = "en"
-    user_dict_path = dictionary_utils._get_user_dict_path(lang)
+    user_dict_path = dictionary_utils._get_user_dict_path()
     if os.path.exists(user_dict_path): # Ensure no user dict exists before test
         os.remove(user_dict_path)
     user_dict_dir = os.path.dirname(user_dict_path)
     if os.path.exists(user_dict_dir) and not os.listdir(user_dict_dir):
-        os.rmdir(user_dict_dir) # Remove user lang dir if empty
+        os.rmdir(user_dict_dir) # Remove user dir if empty
 
     default_dict_content = {"CUSTOM_SYLLABLE_DICT": {"defaultword": 2}}
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump(default_dict_content, f)
 
-    dictionary_utils.revert_custom_dict_to_default(lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.revert_custom_dict_to_default()
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == default_dict_content["CUSTOM_SYLLABLE_DICT"] # Should create user dict from default
 
 
 def test_revert_custom_dict_to_default_empty_default_dict(test_env):
     _, test_resources_dir = test_env
-    lang = "en"
-    default_dict_path = dictionary_utils._get_default_dict_path(lang)
+    default_dict_path = dictionary_utils._get_default_dict_path()
     with open(os.path.join(test_resources_dir, default_dict_path), 'w', encoding='utf-8') as f:
         json.dump({}, f) # Empty default dictionary
 
-    dictionary_utils.revert_custom_dict_to_default(lang)
-    loaded_dict = dictionary_utils.load_custom_syllable_dict(lang)
+    dictionary_utils.revert_custom_dict_to_default()
+    loaded_dict = dictionary_utils.load_custom_syllable_dict()
     assert loaded_dict == {} # Should revert to empty dict
+
+
+def test_verbose_output_structure():
+    """Test that verbose output has the expected structure."""
+    result = scireadability.flesch_kincaid_grade(long_test, verbose=True)
+
+    # Check basic structure
+    assert isinstance(result, dict)
+    assert "score" in result
+    assert "metric" in result
+    assert "complex_sentences" in result
+    assert "improvement_summary" in result
+
+    # Check types
+    assert isinstance(result["score"], float)
+    assert isinstance(result["metric"], str)
+    assert isinstance(result["complex_sentences"], list)
+    assert isinstance(result["improvement_summary"], dict)
+
+    # Check metric name matches
+    assert result["metric"] == "flesch_kincaid_grade"
+
+    # Check score matches non-verbose output
+    non_verbose_score = scireadability.flesch_kincaid_grade(long_test)
+    assert result["score"] == non_verbose_score
+
+
+def test_verbose_empty_string():
+    """Test that verbose mode handles empty strings correctly."""
+    result = scireadability.flesch_kincaid_grade("", verbose=True)
+
+    assert result["score"] == 0.0
+    assert len(result["complex_sentences"]) == 0
+    assert result["improvement_summary"]["total_complex_sentences"] == 0
+
+
+def test_verbose_complex_sentences():
+    """Test that complex sentences are identified and analyzed correctly."""
+    result = scireadability.flesch_kincaid_grade(long_test, verbose=True)
+
+    # Check complex sentences list
+    assert len(result["complex_sentences"]) > 0
+
+    # Check first complex sentence has expected data
+    first_sentence = result["complex_sentences"][0]
+    assert "text" in first_sentence
+    assert "length" in first_sentence
+    assert "avg_syllables" in first_sentence
+    assert isinstance(first_sentence["text"], str)
+    assert isinstance(first_sentence["length"], int)
+    assert isinstance(first_sentence["avg_syllables"], float)
+
+    # Verify text is actually from the original text
+    assert first_sentence["text"] in long_test
+
+
+def test_verbose_config():
+    """Test that verbose_config parameters work correctly."""
+    # Test with default config
+    default_result = scireadability.flesch_kincaid_grade(long_test, verbose=True)
+
+    # Test with custom top_n
+    custom_config = {"top_n": 3}
+    custom_result = scireadability.flesch_kincaid_grade(long_test, verbose=True,
+                                                        verbose_config=custom_config)
+
+    assert len(custom_result["complex_sentences"]) == 3
+    assert len(default_result["complex_sentences"]) > 3
+
+    # Test with word analysis disabled
+    no_word_config = {"include_word_analysis": False}
+    no_word_result = scireadability.flesch_kincaid_grade(long_test, verbose=True,
+                                                         verbose_config=no_word_config)
+
+    # "difficult_word_list" should be empty or very short
+    if "difficult_word_list" in no_word_result["complex_sentences"][0]:
+        assert len(no_word_result["complex_sentences"][0]["difficult_word_list"]) == 0
+
+
+def test_verbose_suggestions():
+    """Test that improvement suggestions are generated."""
+    result = scireadability.flesch_kincaid_grade(long_test, verbose=True)
+
+    # Check that at least some sentences have suggestions
+    has_suggestions = False
+    for sentence in result["complex_sentences"]:
+        if "suggestions" in sentence and len(sentence["suggestions"]) > 0:
+            has_suggestions = True
+            break
+
+    assert has_suggestions, "No improvement suggestions were generated"
+
+    # Test with suggestions disabled
+    no_suggestions = {"include_suggestions": False}
+    no_sugg_result = scireadability.flesch_kincaid_grade(long_test, verbose=True,
+                                                         verbose_config=no_suggestions)
+
+    has_suggestions = False
+    for sentence in no_sugg_result["complex_sentences"]:
+        if "suggestions" in sentence and len(sentence["suggestions"]) > 0:
+            has_suggestions = True
+            break
+
+    assert not has_suggestions, "Suggestions found even though they were disabled"
+
+
+def test_various_metrics_verbose():
+    """Test that verbose mode works with different readability metrics."""
+    # Test a few different metrics with verbose mode
+    metrics = [
+        "flesch_reading_ease",
+        "gunning_fog",
+        "coleman_liau_index",
+        "dale_chall_readability_score",
+        "smog_index"
+    ]
+
+    for metric in metrics:
+        method = getattr(scireadability, metric)
+        result = method(long_test, verbose=True)
+
+        assert isinstance(result, dict)
+        assert result["metric"] == metric
+        assert "complex_sentences" in result
+        assert len(result["complex_sentences"]) > 0
+
+
+def test_text_standard_verbose():
+    """Test that text_standard verbose mode provides comprehensive analysis."""
+    result = scireadability.text_standard(long_test, verbose=True)
+
+    assert isinstance(result, dict)
+    assert "consensus_score" in result
+    assert "individual_scores" in result
+    assert "complex_sentences" in result
+
+    # Check individual scores include multiple metrics
+    assert len(result["individual_scores"]) > 3
+
+    # Check that flagged_by exists in complex sentences
+    first_sentence = result["complex_sentences"][0]
+    assert "flagged_by" in first_sentence
+    assert isinstance(first_sentence["flagged_by"], list)
+    assert len(first_sentence["flagged_by"]) > 0
+
+
+def test_verbose_score_consistency():
+    """
+    Test that scores returned in verbose mode match exactly the scores
+    returned in non-verbose mode across all metrics and various text samples.
+    """
+    # Test multiple readability metrics
+    metrics = [
+        "flesch_reading_ease",
+        "flesch_kincaid_grade",
+        "gunning_fog",
+        "coleman_liau_index",
+        "dale_chall_readability_score",
+        "automated_readability_index",
+        "smog_index",
+        # Skip linsear_write_formula for empty strings as it has special behavior
+    ]
+
+    # Test with various text samples including edge cases
+    test_texts = [
+        long_test,  # Normal long text
+        short_test,  # Short text
+        #"",  # Empty string - skip this as it has special handling
+        "Single.",  # Single word
+        punct_text,  # Text with lots of punctuation
+        easy_text,  # Simple text
+        "Pneumonoultramicroscopicsilicovolcanoconiosis is a long word."  # Complex word
+    ]
+
+    # Test each metric with each text
+    for metric in metrics:
+        method = getattr(scireadability, metric)
+
+        for text in test_texts:
+            # Get scores in both modes
+            regular_score = method(text)
+            verbose_result = method(text, verbose=True)
+
+            # Scores should match exactly
+            assert verbose_result["score"] == regular_score, \
+                f"Score mismatch for {metric} with text: {text[:30]}..."
+
+            # Also check with different verbose_config values
+            configs = [
+                {"top_n": 3},
+                {"include_word_analysis": False},
+                {"include_suggestions": False},
+                {"top_n": 5, "include_word_analysis": False, "include_suggestions": False}
+            ]
+
+            for config in configs:
+                config_result = method(text, verbose=True, verbose_config=config)
+                assert config_result["score"] == regular_score, \
+                    f"Score mismatch with config {config} for {metric} with text: {text[:30]}..."
+
+
+def test_empty_string_handling():
+    """Test that all metrics handle empty strings consistently."""
+    metrics = [
+        "flesch_reading_ease",
+        "flesch_kincaid_grade",
+        "gunning_fog",
+        "coleman_liau_index",
+        "dale_chall_readability_score",
+        "automated_readability_index",
+        "smog_index",
+        "lix",
+        "rix",
+        "spache_readability",
+        "dale_chall_readability_score_v2",
+        "mcalpine_eflaw"
+    ]
+
+    # Check each metric handles empty strings properly
+    for metric_name in metrics:
+        metric = getattr(scireadability, metric_name)
+        result = metric(empty_str)
+        assert result == 0.0, f"Metric {metric_name} didn't return 0.0 for empty string"
+
+    # Test special cases
+    assert scireadability.linsear_write_formula(empty_str) == -1.0
+    assert scireadability.text_standard(empty_str) == "0th grade"

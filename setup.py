@@ -4,7 +4,7 @@ from io import open
 setup(
     name="scireadability",
     packages=["scireadability"],
-    version="0.6.4",
+    version="1.0.0",
     description="Calculate statistical features from text, mainly scientific literature",
     author="Shivam Bansal, Chaitanya Aggarwal, Robert Roth",
     author_email="rwroth5@gmail.com",
@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     package_data={"": ["resources/en/easy_word_list.txt", "resources/en/custom_dict.json"]},
     include_package_data=True,
-    install_requires=["pyphen", "cmudict", "setuptools", "appdirs"],
+    install_requires=["cmudict", "setuptools", "appdirs"],
     license="MIT",
     python_requires=">=3.10",
     project_urls={

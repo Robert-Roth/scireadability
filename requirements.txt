@@ -1,4 +1,3 @@
 cmudict
 setuptools
-pyphen
 appdirs
