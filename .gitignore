@@ -627,5 +627,3 @@ MigrationBackup/
 
 # pylint
 .pylint.d/
-
-.codespellignorelines

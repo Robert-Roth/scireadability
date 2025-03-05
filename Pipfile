@@ -10,7 +10,6 @@ setuptools = "*"
 appdirs = "*"
 
 [dev-packages]
-codespell = "*"
 flake8 = "*"
 ipython = "*"
 pytest = "*"
