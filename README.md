@@ -438,12 +438,6 @@ This feature is particularly useful for:
 
 The `text_standard()` function with `verbose=True` provides an especially comprehensive analysis by combining results from multiple readability metrics to identify sentences that are consistently flagged as complex across different formulas.
 
-## Advanced usage and customization
-
-`scireadability` incorporates several advanced features for customization and performance:
-
-- **Caching**: For efficiency, `scireadability` extensively uses caching (via `@lru_cache`) to store the results of computationally intensive functions like syllable count and various text statistics. This significantly speeds up repeated analyses of the same or similar texts.
-
 ## Limitations
 
 Please be aware of the following limitations:
