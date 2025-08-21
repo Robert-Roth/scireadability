@@ -4,7 +4,7 @@ from io import open
 setup(
     name="scireadability",
     packages=["scireadability"],
-    version="2.0.0",
+    version="2.0.1",
     description="Calculate statistical features from text, mainly scientific literature",
     author="Robert Roth",
     author_email="rwroth5@gmail.com",
