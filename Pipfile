@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-cmudict = "*"
 "repoze.lru" = "*"
 setuptools = "*"
 appdirs = "*"
