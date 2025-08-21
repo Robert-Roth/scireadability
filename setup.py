@@ -6,13 +6,13 @@ setup(
     packages=["scireadability"],
     version="2.0.0",
     description="Calculate statistical features from text, mainly scientific literature",
-    author="Shivam Bansal, Chaitanya Aggarwal, Robert Roth",
+    author="Robert Roth",
     author_email="rwroth5@gmail.com",
     url="https://github.com/robert-roth/scireadability",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     package_data={
-        "": ["resources/en/easy_word_list.txt", "resources/en/custom_dict.json",
+        "": ["resources/en/easy_words.txt", "resources/en/custom_dict.json",
              "resources/en/cmudict.dict"]
     },
     include_package_data=True,
