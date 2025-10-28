@@ -1,5 +1,5 @@
 # scireadability
-[![PyPI Downloads](https://static.pepy.tech/badge/scireadability)](https://pepy.tech/projects/scireadability)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **`scireadability` is a user-friendly Python library designed to calculate text statistics for English texts. It's helpful for assessing readability, complexity, and grade level of texts. While specifically enhanced for scientific documents, it works well with any type of text. Punctuation is removed by default, with the exception of apostrophes in contractions.**
 
