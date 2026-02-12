@@ -5,7 +5,7 @@ from collections import Counter
 from functools import lru_cache, wraps
 from typing import Union, Dict, List, Set, Optional
 
-import pkg_resources
+from importlib.resources import files
 
 from .dictionary_utils import (
     add_term_to_custom_dict,
@@ -66,9 +66,7 @@ def _load_cmu_dict() -> Dict[str, List[List[str]]]:
     """Loads the CMU dictionary from package resources."""
     cmu_dict_path = "resources/en/cmudict.dict"
     pronouncing_dict: Dict[str, List[List[str]]] = {}
-    cmu_text = pkg_resources.resource_string("scireadability", cmu_dict_path).decode(
-        "utf-8"
-    )
+    cmu_text = files("scireadability").joinpath(cmu_dict_path).read_text("utf-8")
     for line in cmu_text.splitlines():
         if not line.startswith(";;;"):
             parts = line.split()
@@ -669,9 +667,10 @@ def _get_easy_words() -> Set[str]:
     try:
         return {
             ln.decode("utf-8").strip()
-            for ln in pkg_resources.resource_stream(
-                "scireadability", "resources/en/easy_words.txt"
-            )
+            for ln in files("scireadability")
+            .joinpath("resources/en/easy_words.txt")
+            .read_bytes()
+            .splitlines()
         }
     except FileNotFoundError:
         warnings.warn("Could not find the easy words vocabulary file.", Warning)

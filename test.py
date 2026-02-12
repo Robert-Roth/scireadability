@@ -27,19 +27,17 @@ def test_env():
     os.makedirs(default_dict_en_dir, exist_ok=True)  # Create it
 
     original_user_config_dir = dictionary_utils.user_config_dir
-    original_resource_string = dictionary_utils.pkg_resources.resource_string
+    original_read_resource = dictionary_utils._read_package_resource
     dictionary_utils.user_config_dir = lambda package_name: test_config_dir
-    dictionary_utils.pkg_resources.resource_string = (
-        lambda package_name, resource_path: _mock_resource_string(
-            test_resources_dir, resource_path
-        )
+    dictionary_utils._read_package_resource = lambda resource_path: (
+        _mock_resource_string(test_resources_dir, resource_path)
     )
 
     yield test_config_dir, test_resources_dir
 
     # --- Teardown ---
     dictionary_utils.user_config_dir = original_user_config_dir
-    dictionary_utils.pkg_resources.resource_string = original_resource_string
+    dictionary_utils._read_package_resource = original_read_resource
     if os.path.exists(test_config_dir):
         shutil.rmtree(test_config_dir)
     if os.path.exists(test_resources_dir):
@@ -47,7 +45,7 @@ def test_env():
 
 
 def _mock_resource_string(test_resources_dir, resource_path):
-    """Mock for pkg_resources.resource_string to use test resources."""
+    """Mock for _read_package_resource to use test resources."""
     full_resource_path = os.path.join(test_resources_dir, resource_path)
     if not os.path.exists(full_resource_path):
         raise FileNotFoundError(f"Resource not found: {full_resource_path}")

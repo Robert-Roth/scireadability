@@ -1,9 +1,14 @@
 from appdirs import user_config_dir
+from importlib.resources import files
 import json
 import os
-import pkg_resources
 
 PACKAGE_NAME = "scireadability"
+
+
+def _read_package_resource(resource_path: str) -> bytes:
+    """Reads a package resource file and returns its contents as bytes."""
+    return files("scireadability").joinpath(resource_path).read_bytes()
 
 
 def _get_default_dict_path():
@@ -43,9 +48,7 @@ def load_custom_syllable_dict():
         pass  # User dict is optional
 
     try:
-        default_dict_string = pkg_resources.resource_string(
-            __name__, default_dict_path
-        ).decode("utf-8")
+        default_dict_string = _read_package_resource(default_dict_path).decode("utf-8")
         default_data = json.loads(default_dict_string)
         if "CUSTOM_SYLLABLE_DICT" in default_data:
             loaded_dict.update(
@@ -181,9 +184,7 @@ def revert_custom_dict_to_default():
     try:
         # Load the default dictionary content from the package resource
         resource_path = _get_default_dict_path()
-        json_data = pkg_resources.resource_string(__name__, resource_path).decode(
-            "utf-8"
-        )
+        json_data = _read_package_resource(resource_path).decode("utf-8")
         default_dict_data = json.loads(json_data)
 
         # Write the default dictionary content to the user's custom dictionary path,

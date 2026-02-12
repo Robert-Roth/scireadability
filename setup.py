@@ -4,7 +4,7 @@ from io import open
 setup(
     name="scireadability",
     packages=["scireadability"],
-    version="2.0.1",
+    version="2.0.2",
     description="Calculate statistical features from text, mainly scientific literature",
     author="Robert Roth",
     author_email="rwroth5@gmail.com",
@@ -12,11 +12,14 @@ setup(
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     package_data={
-        "": ["resources/en/easy_words.txt", "resources/en/custom_dict.json",
-             "resources/en/cmudict.dict"]
+        "": [
+            "resources/en/easy_words.txt",
+            "resources/en/custom_dict.json",
+            "resources/en/cmudict.dict",
+        ]
     },
     include_package_data=True,
-    install_requires=["setuptools", "appdirs"],
+    install_requires=["appdirs"],
     license="MIT",
     python_requires=">=3.10",
     project_urls={
