@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scireadability"
+dynamic = ["version"]
+description = "Calculate statistical features from text, mainly scientific literature"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Robert Roth", email = "rwroth5@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = ["platformdirs"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3 :: Only",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Topic :: Text Processing",
+]
+
+[project.urls]
+Homepage = "https://github.com/robert-roth/scireadability"
+Documentation = "https://github.com/robert-roth/scireadability"
+Demo = "https://scireadability-rwroth5.pythonanywhere.com/analyze/"
+
+[tool.setuptools]
+packages = ["scireadability"]
+
+[tool.setuptools.package-data]
+scireadability = ["resources/en/*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "scireadability.__version__" }
