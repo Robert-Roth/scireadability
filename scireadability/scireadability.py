@@ -20,7 +20,6 @@ from .dictionary_utils import (
 _round_outputs = False
 _round_points = None
 _rm_apostrophe = False
-text_encoding = "utf-8"
 
 
 # --- helper functions and decorators ---
@@ -54,7 +53,7 @@ def _apply_rounding(
     return number
 
 
-def get_grade_suffix(grade: int) -> str:
+def _get_grade_suffix(grade: int) -> str:
     """Selects the correct ordinal suffix for a given grade."""
     ordinal_map = {1: "st", 2: "nd", 3: "rd"}
     teens_map = {11: "th", 12: "th", 13: "th"}
@@ -100,6 +99,16 @@ ADDITIONAL = re.compile(
     flags=re.I,
 )
 
+HYPHEN = re.compile("[-\u2010\u2011]")
+# Periods directly followed by a letter or digit (decimals, "e.g", "T.V").
+INTRAWORD_PERIOD = re.compile(r"\.(?=[^\W_])")
+# Periods after single capital initials (genus abbreviations like "C. atratus",
+# author initials) and common abbreviations that rarely end a sentence.
+ABBREVIATION_PERIOD = re.compile(
+    r"\b([A-Z]|Dr|Mr|Mrs|Ms|Prof|Fig|Figs|Eq|Eqs|Ref|Refs|Vol|No|vs|cf|al|"
+    r"approx|ca|sp|spp|subsp|var|eg|ie|Jr|Sr|St)\.(?=\s)"
+)
+
 # --- species name adjustments ---
 SPECIES_NAME_ADJUSTMENTS = {
     "ii": 1,
@@ -128,8 +137,6 @@ def set_rm_apostrophe(rm_apostrophe: bool) -> None:
 def _cache_clear() -> None:
     """Clears all cached results from LRU caches."""
     caching_funcs = [
-        _load_cmu_dict,
-        _get_easy_words,
         char_count,
         letter_count,
         lexicon_count,
@@ -197,20 +204,37 @@ def char_count(text: str, ignore_spaces: bool = True) -> int:
 
 @lru_cache(maxsize=128)
 def letter_count(text: str, ignore_spaces: bool = True) -> int:
-    """Counts the letters (A–Z) in a text."""
-    if ignore_spaces:
-        text = re.sub(r"\s", "", text)
+    """Counts the alphabetic characters (in any script) in a text.
+
+    `ignore_spaces` is kept for compatibility; spaces are never letters.
+    """
     return sum(1 for ch in text if ch.isalpha())
 
 
 def remove_punctuation(text: str) -> str:
     """Removes punctuation from a text."""
+    text = text.replace("\u2019", "'")
     if _rm_apostrophe:
         punctuation_regex = r"[^\w\s]"
     else:
         text = re.sub(r"\'(?![tsd]\b|ve\b|ll\b|re\b)", '"', text)
         punctuation_regex = r"[^\w\s\']"
     return re.sub(punctuation_regex, "", text)
+
+
+def _words(text: str) -> List[str]:
+    """Splits text into words with punctuation removed.
+
+    Hyphens inside compounds are kept ("well-balanced") so syllables can be
+    counted per part. Each compound still counts as one word, as in Flesch's
+    original counting rules.
+    """
+    words = []
+    for token in text.split():
+        parts = [p for p in map(remove_punctuation, HYPHEN.split(token)) if p]
+        if parts:
+            words.append("-".join(parts))
+    return words
 
 
 @lru_cache(maxsize=128)
@@ -232,39 +256,32 @@ def miniword_count(text: str, max_size: int = 3) -> int:
 @lru_cache(maxsize=128)
 def syllable_count(text: str) -> int:
     """Calculates syllables in words using a multi-tiered approach."""
-    if isinstance(text, bytes):
-        text = text.decode(text_encoding)
+    return sum(_word_syllable_count(word) for word in _words(text.lower()))
 
-    text = text.lower()
-    text = remove_punctuation(text)
 
-    if not text:
-        return 0
+def _word_syllable_count(word: str) -> int:
+    """Counts syllables in one lowercase word: custom dictionary, then CMUdict,
+    then hyphenated parts separately, then the regex fallback."""
+    # Custom dictionary keys are stored without hyphens ("covid19").
+    joined = word.replace("-", "")
+    if joined in custom_dict:
+        return custom_dict[joined]
 
-    total_syllables = 0
-    for word in text.split():
-        if word in custom_dict:
-            total_syllables += custom_dict[word]
-            continue
+    if word in cmu_pronouncing_dict:
+        return min(
+            sum(1 for p in phones if p[-1].isdigit())
+            for phones in cmu_pronouncing_dict[word]
+        )
 
-        if word in cmu_pronouncing_dict:
-            try:
-                phones_list = cmu_pronouncing_dict[word]
-                syls = min(
-                    sum(1 for p in phones if p[-1].isdigit()) for phones in phones_list
-                )
-                total_syllables += syls
-                continue
-            except (TypeError, IndexError, ValueError):
-                pass
+    if "-" in word:
+        return sum(_word_syllable_count(part) for part in word.split("-"))
 
-        count = regex_syllable_count(word)
-        for ending, adjust in SPECIES_NAME_ADJUSTMENTS.items():
-            if word.endswith(ending):
-                count += adjust
-                break
-        total_syllables += count
-    return total_syllables
+    count = regex_syllable_count(word)
+    for ending, adjust in SPECIES_NAME_ADJUSTMENTS.items():
+        if word.endswith(ending):
+            count += adjust
+            break
+    return count
 
 
 def regex_syllable_count(word: str) -> int:
@@ -279,6 +296,8 @@ def regex_syllable_count(word: str) -> int:
 @lru_cache(maxsize=128)
 def sentence_count(text: str) -> int:
     """Counts the sentences in a text."""
+    text = INTRAWORD_PERIOD.sub("", text)
+    text = ABBREVIATION_PERIOD.sub(r"\1", text)
     sentences = re.findall(r"\b[^.!?]+[.!?]*", text, re.UNICODE)
     ignore_count = sum(1 for s in sentences if lexicon_count(s) <= 2)
     return max(1, len(sentences) - ignore_count)
@@ -398,7 +417,7 @@ def automated_readability_index(
     if not text.strip() or lexicon_count(text) == 0:
         return 0.0
 
-    acw = avg_character_per_word(text)
+    acw = sum(1 for ch in text if ch.isalnum()) / lexicon_count(text)
     wps = words_per_sentence(text)
 
     readability = (4.71 * acw) + (0.5 * wps) - 21.43
@@ -409,13 +428,20 @@ def linsear_write_formula(
     text: str, rounding: Optional[bool] = None, points: Optional[int] = None
 ) -> float:
     """Calculates the Linsear Write formula."""
-    if not text.strip():
+    # Keep the sample's punctuation so its sentences can be counted.
+    sample_tokens, n_words = [], 0
+    for token in text.split():
+        if n_words == 100:
+            break
+        sample_tokens.append(token)
+        n_words += len(_words(token))
+    text_sample = " ".join(sample_tokens)
+    text_list = _words(text_sample)
+    if not text_list:
         return -1.0
 
-    text_list = text.split()[:100]
     easy_word = sum(1 for word in text_list if syllable_count(word) < 3)
     difficult_word = len(text_list) - easy_word
-    text_sample = " ".join(text_list)
 
     try:
         number = float((easy_word + (difficult_word * 3)) / sentence_count(text_sample))
@@ -436,7 +462,9 @@ def forcast(
     if not text.strip():
         return 0.0
 
-    words = remove_punctuation(text).split()
+    words = _words(text)
+    if not words:
+        return 0.0
     if len(words) < 150:
         warnings.warn(
             "FORCAST formula is validated on a 150-word sample. "
@@ -445,7 +473,9 @@ def forcast(
 
     sample = words[:150]
     single_syllable_count = sum(1 for w in sample if syllable_count(w) == 1)
-    score = 20.0 - (single_syllable_count / 10.0)
+    # Normalize to a 150-word sample so short texts aren't scored as harder.
+    scaled_count = single_syllable_count * 150 / len(sample)
+    score = 20.0 - (scaled_count / 10.0)
     return _apply_rounding(score, rounding, points, default_points=1)
 
 
@@ -554,7 +584,7 @@ def mcalpine_eflaw(
 def text_standard(text: str, as_string: bool = True) -> Union[float, str]:
     """Calculates a consensus readability score."""
     if not text.strip():
-        return "0th grade" if as_string else 0.0
+        return "N/A" if as_string else 0.0
 
     grade_levels = []
 
@@ -562,22 +592,7 @@ def text_standard(text: str, as_string: bool = True) -> Union[float, str]:
     grade_levels.extend([round(fk_grade), math.ceil(fk_grade)])
 
     score = flesch_reading_ease(text, rounding=False)
-    if 100 > score >= 90:
-        grade_levels.append(5)
-    elif 90 > score >= 80:
-        grade_levels.append(6)
-    elif 80 > score >= 70:
-        grade_levels.append(7)
-    elif 70 > score >= 60:
-        grade_levels.extend([8, 9])
-    elif 60 > score >= 50:
-        grade_levels.append(10)
-    elif 50 > score >= 40:
-        grade_levels.append(11)
-    elif 40 > score >= 30:
-        grade_levels.append(12)
-    else:
-        grade_levels.append(13)
+    grade_levels.extend(_fre_score_to_grades(score))
 
     metrics = [
         smog_index,
@@ -588,6 +603,9 @@ def text_standard(text: str, as_string: bool = True) -> Union[float, str]:
         gunning_fog,
     ]
     for metric in metrics:
+        # SMOG returns 0.0 as a "not applicable" value below 3 sentences.
+        if metric is smog_index and sentence_count(text) < 3:
+            continue
         val = metric(text, rounding=False)
         if not isinstance(val, (int, float)) or val < 0:
             continue
@@ -609,24 +627,20 @@ def text_standard(text: str, as_string: bool = True) -> Union[float, str]:
 
     lower_grade = consensus_grade - 1
     return (
-        f"{lower_grade}{get_grade_suffix(lower_grade)} and "
-        f"{consensus_grade}{get_grade_suffix(consensus_grade)} grade"
+        f"{lower_grade}{_get_grade_suffix(lower_grade)} and "
+        f"{consensus_grade}{_get_grade_suffix(consensus_grade)} grade"
     )
 
 
 # --- word and syllable counts ---
 def polysyllabcount(text: str) -> int:
     """Counts words with three or more syllables."""
-    return sum(
-        1 for word in remove_punctuation(text).split() if syllable_count(word) >= 3
-    )
+    return sum(1 for word in _words(text) if syllable_count(word) >= 3)
 
 
 def monosyllabcount(text: str) -> int:
     """Counts words with one syllable."""
-    return sum(
-        1 for word in remove_punctuation(text).split() if syllable_count(word) < 2
-    )
+    return sum(1 for word in _words(text) if syllable_count(word) < 2)
 
 
 def long_word_count(text: str) -> int:
@@ -642,14 +656,14 @@ def difficult_words(text: str, syllable_threshold: int = 2) -> int:
 
 def difficult_words_list(text: str, syllable_threshold: int = 2) -> List[str]:
     """Gets a list of difficult word tokens."""
-    tokens = remove_punctuation(text).lower().split()
+    tokens = _words(text.lower())
     return [word for word in tokens if is_difficult_word(word, syllable_threshold)]
 
 
 def is_difficult_word(word: str, syllable_threshold: int = 2) -> bool:
     easy_word_set = _get_easy_words()
     w = word.lower()
-    if w in easy_word_set:
+    if w in easy_word_set or any(s in easy_word_set for s in _inflection_stems(w)):
         return False
     if syllable_threshold > 0 and syllable_count(w) < syllable_threshold:
         return False
@@ -659,6 +673,28 @@ def is_difficult_word(word: str, syllable_threshold: int = 2) -> bool:
 def is_easy_word(word: str, syllable_threshold: int = 2) -> bool:
     """Returns true if a word is easy."""
     return not is_difficult_word(word, syllable_threshold)
+
+
+def _inflection_stems(word: str) -> List[str]:
+    """Possible base forms of a regularly inflected word, following the Dale-Chall
+    rule that plurals, possessives, -ed, -ing, -er, -est and -ly forms of
+    familiar words are also familiar."""
+    stems = []
+    if word.endswith("'s"):
+        stems.append(word[:-2])
+    for suffix in ("ies", "ied", "ier", "iest", "ily"):
+        if word.endswith(suffix):
+            stems.append(word[: -len(suffix)] + "y")
+    for suffix in ("es", "s", "ly"):
+        if word.endswith(suffix):
+            stems.append(word[: -len(suffix)])
+    for suffix in ("ed", "ing", "er", "est"):
+        if word.endswith(suffix):
+            stem = word[: -len(suffix)]
+            stems.extend([stem, stem + "e"])
+            if len(stem) > 2 and stem[-1] == stem[-2]:  # "running" -> "run"
+                stems.append(stem[:-1])
+    return [s for s in stems if len(s) >= 2]
 
 
 @lru_cache(maxsize=1)
@@ -678,6 +714,25 @@ def _get_easy_words() -> Set[str]:
 
 
 # --- other utilities ---
+def _fre_score_to_grades(score: float) -> List[int]:
+    if score >= 90:
+        return [5]
+    elif score >= 80:
+        return [6]
+    elif score >= 70:
+        return [7]
+    elif score >= 60:
+        return [8, 9]
+    elif score >= 50:
+        return [10]
+    elif score >= 40:
+        return [11]
+    elif score >= 30:
+        return [12]
+    else:
+        return [13]
+
+
 def _dc_score_to_grade(score: float) -> int:
     if score <= 4.9:
         return 4  # 4th grade and below
@@ -700,6 +755,8 @@ def reading_time(
     points: Optional[int] = None,
 ) -> float:
     """Calculates reading time in seconds based on words per minute."""
+    if wpm <= 0:
+        raise ValueError("wpm must be a positive number.")
     words = lexicon_count(text)
     if words == 0:
         return 0.0

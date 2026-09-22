@@ -19,9 +19,11 @@ While building upon the excellent `textstat` library, `scireadability` is enhanc
 ### Key features
 
 - **Accurate syllable counts** using a multi-tiered approach:
-  1) **CMUdict** (takes the *minimum* syllable count across pronunciations),
-  2) a **custom dictionary** you can edit/extend,
+  1) a **custom dictionary** you can edit/extend (checked first, so it can override the others),
+  2) **CMUdict** (takes the *minimum* syllable count across pronunciations),
   3) a refined **regex** fallback with scientific-name adjustments.
+
+  Hyphenated compounds (e.g., `nitrogen-rich`) are counted part by part, but still count as one word.
 - **Token-based difficult word rates** where the original formulas expect them.
 - **Configurable apostrophe handling** and **rounding**.
 
@@ -31,7 +33,7 @@ While building upon the excellent `textstat` library, `scireadability` is enhanc
 
 ```bash
 pip install scireadability
-````
+```
 
 ### Usage
 
@@ -69,20 +71,27 @@ For all functions, the input argument (`text`) is the text you want to analyze.
 
 This library is English-only by design. Syllables are computed via:
 
-* **CMUdict**: Carnegie Mellon Pronouncing Dictionary; when multiple pronunciations exist, the **minimum** syllable count is used.
 * **Custom dictionary**: User-editable overrides for domain terms.
+* **CMUdict**: Carnegie Mellon Pronouncing Dictionary; when multiple pronunciations exist, the **minimum** syllable count is used.
 * **Regex fallback**: An improved counter that handles common scientific suffixes (e.g., species names), which typical counters undercount.
 
 ## Custom syllable dictionary
 
 Tune syllables for edge cases or specialized vocabulary.
 
-* `load_custom_syllable_dict()`
-* `overwrite_dictionary(file_path)`
-* `add_word_to_dictionary(word, syllable_count)`
-* `add_words_from_file_to_dictionary(file_path)`
-* `revert_dictionary_to_default()`
-* `print_dictionary()`
+* `add_word_to_dictionary(word, syllable_count)`: add or change one word.
+* `add_words_from_file_to_dictionary(file_path)`: add or change the words in a JSON file.
+* `overwrite_dictionary(file_path)`: replace all of your entries with the words in a JSON file.
+* `revert_dictionary_to_default()`: remove all of your entries.
+* `print_dictionary()`: print the dictionary currently in use.
+
+The package ships with a default dictionary of scientific terms. Your entries are stored separately
+in your user config directory and take precedence over the defaults, so you keep getting new default
+entries when you upgrade. Words are stored lowercase without punctuation other than apostrophes, so
+`COVID-19` is saved as `covid19` and matches `COVID-19`, `covid-19`, and `COVID19` in text.
+
+To store your dictionary somewhere else (for example, on a shared server), set the
+`SCIREADABILITY_CONFIG_DIR` environment variable to a directory before importing `scireadability`.
 
 **Dictionary file format**
 
@@ -199,7 +208,7 @@ Uses the **first 100 words**; counts “easy” (1–2 syllables) and “difficu
 scireadability.dale_chall_readability_score(text)
 ```
 
-Computes the standard DC score from **token-based** difficult words and maps to grade bands in `text_standard`.
+Computes the standard DC score from **token-based** difficult words and maps to grade bands in `text_standard`. As in the original rules, regular inflections of familiar words (plurals, possessives, *-ed*, *-ing*, *-er*, *-est*, *-ly*) are also familiar.
 
 | Score        | Understood by                      |
 | ------------ | ---------------------------------- |
@@ -262,7 +271,11 @@ scireadability.lix(text)
 **RIX**
 
 A simple formula that calculates a grade-level score based on the ratio of long words (more than 6 characters) to the number of sentences.
-It is closely related to LIX but presents the output as a grade level.
+It is closely related to LIX. Like LIX, the score is not a grade level.
+
+```python
+scireadability.rix(text)
+```
 
 
 **Reading time**
@@ -281,7 +294,7 @@ Returns **seconds**, using a words-per-minute model (default 200 WPM).
 scireadability.syllable_count(text)
 ```
 
-Total syllables; CMUdict → custom dict → regex fallback.
+Total syllables; custom dict → CMUdict → hyphenated parts → regex fallback.
 
 **Word count (lexicon)**
 
@@ -289,7 +302,7 @@ Total syllables; CMUdict → custom dict → regex fallback.
 scireadability.lexicon_count(text, removepunct=True)
 ```
 
-Counts tokens; hyphens/punctuation removed by default. Apostrophes depend on `set_rm_apostrophe()`.
+Counts tokens; punctuation removed by default, and hyphenated compounds count as one word. Apostrophes depend on `set_rm_apostrophe()`.
 
 **Sentence count**
 
@@ -297,7 +310,7 @@ Counts tokens; hyphens/punctuation removed by default. Apostrophes depend on `se
 scireadability.sentence_count(text)
 ```
 
-Regex-based; very short “sentences” (≤2 words) are ignored.
+Regex-based; very short “sentences” (≤2 words) are ignored. Periods in decimals (`7.4`), abbreviations (`e.g.`, `et al.`, `Fig.`, `spp.`), and initials (`C. atratus`) don't end a sentence.
 
 **Character count**
 
@@ -313,13 +326,13 @@ Counts all characters (optionally ignoring spaces).
 scireadability.letter_count(text, ignore_spaces=True)
 ```
 
-Counts **alphabetic** code points (letters only). Spaces aren’t letters, so the flag typically has no effect.
+Counts **alphabetic** characters in any script. Spaces aren’t letters, so `ignore_spaces` has no effect; it's kept for compatibility.
 
 **Polysyllable / Monosyllable counts**
 
 ```python
 scireadability.polysyllabcount(text)   # ≥3 syllables
-scireadability.monosyllabcount(text)   # exactly 1 syllable
+scireadability.monosyllabcount(text)   # 1 syllable or fewer
 ```
 
 ## Limitations
@@ -328,6 +341,7 @@ scireadability.monosyllabcount(text)   # exactly 1 syllable
 * Short snippets make most readability scores unstable.
 * Extremely novel jargon may still require custom dictionary entries.
 * Counting syllables with heuristics is inherently approximate; the regex fallback agrees with CMUdict \~91% of the time.
+* Numbers count as one syllable each (e.g., `2024`), so number-heavy text may score as easier than it reads.
 * English only.
 
 ## Contributing
@@ -339,6 +353,6 @@ If you hit a bug or want to propose a tweak, please open an
 If you’re able to fix a bug or add a feature, we welcome a
 [pull request](https://github.com/robert-roth/scireadability/pulls).
 
-1. Fork the repo and branch off `master` (or create a dedicated branch).
+1. Fork the repo and branch off `main` (or create a dedicated branch).
 2. Add tests that demonstrate the fix/feature.
 3. Open a PR.

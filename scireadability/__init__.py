@@ -1,4 +1,4 @@
-__version__ = "2.0.2"
+__version__ = "3.0.0"
 
 from .scireadability import (
     # Configuration
@@ -49,8 +49,10 @@ from .scireadability import (
     text_standard,
     reading_time,
     remove_punctuation,
-    _cache_clear,
 )
+
+# Not public API. kept importable for backwards compatibility.
+from .scireadability import _cache_clear  # noqa: F401
 
 __all__ = [
     # Configuration
@@ -101,5 +103,4 @@ __all__ = [
     "text_standard",
     "reading_time",
     "remove_punctuation",
-    "_cache_clear",
 ]
