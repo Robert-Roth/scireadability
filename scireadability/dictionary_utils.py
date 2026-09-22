@@ -1,9 +1,16 @@
-from appdirs import user_config_dir
 from importlib.resources import files
 import json
+import logging
 import os
+import re
+
+from platformdirs import user_config_dir
 
 PACKAGE_NAME = "scireadability"
+DICT_KEY = "CUSTOM_SYLLABLE_DICT"
+CONFIG_DIR_ENV_VAR = "SCIREADABILITY_CONFIG_DIR"
+
+logger = logging.getLogger(__name__)
 
 
 def _read_package_resource(resource_path: str) -> bytes:
@@ -18,192 +25,124 @@ def _get_default_dict_path():
 
 def _get_user_dict_path():
     """Returns the path to the user's custom dictionary in the config directory."""
-    config_dir = user_config_dir(PACKAGE_NAME)
-    dict_dir = os.path.join(config_dir, "en")
-    os.makedirs(dict_dir, exist_ok=True)
-    return os.path.join(dict_dir, "custom_dict.json")
+    config_dir = os.environ.get(CONFIG_DIR_ENV_VAR) or user_config_dir(PACKAGE_NAME)
+    return os.path.join(config_dir, "en", "custom_dict.json")
+
+
+def _normalize_word(word):
+    """Lowercases a word and strips punctuation (e.g. hyphens) except apostrophes,
+    matching how words are looked up during syllable counting."""
+    return re.sub(r"[^\w']", "", word.lower())
+
+
+def _is_positive_int(n):
+    return isinstance(n, int) and not isinstance(n, bool) and n >= 1
+
+
+def _validate_entries(entries, source):
+    """Checks that a dictionary maps words to positive integer syllable counts."""
+    if not isinstance(entries, dict):
+        raise ValueError(
+            f"Invalid dictionary format in {source}. "
+            f"Should be a JSON object with a '{DICT_KEY}' key containing a dictionary."
+        )
+    for word, count in entries.items():
+        if not _is_positive_int(count):
+            raise ValueError(
+                f"Invalid syllable count for '{word}' in {source}: {count!r}. "
+                "Syllable counts must be positive integers."
+            )
+
+
+def _read_dict_file(file_path):
+    """Reads and validates the entries of a dictionary JSON file."""
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, dict) or DICT_KEY not in data:
+        raise ValueError(
+            f"Invalid dictionary format in {file_path}. "
+            f"Should be a JSON object with a '{DICT_KEY}' key."
+        )
+    _validate_entries(data[DICT_KEY], file_path)
+    return {_normalize_word(k): v for k, v in data[DICT_KEY].items()}
+
+
+def load_default_dict():
+    """Loads the default custom syllable dictionary shipped with the package."""
+    default_dict_path = _get_default_dict_path()
+    try:
+        data = json.loads(_read_package_resource(default_dict_path).decode("utf-8"))
+    except FileNotFoundError:
+        logger.warning("Default dictionary not found: %s", default_dict_path)
+        return {}
+    except json.JSONDecodeError as e:
+        logger.warning("Invalid default dictionary %s: %s", default_dict_path, e)
+        return {}
+    return {_normalize_word(k): v for k, v in data.get(DICT_KEY, {}).items()}
+
+
+def load_user_dict():
+    """Loads the user's own dictionary entries (without the package defaults)."""
+    user_dict_path = _get_user_dict_path()
+    try:
+        return _read_dict_file(user_dict_path)
+    except FileNotFoundError:
+        return {}
+    except (json.JSONDecodeError, ValueError) as e:
+        logger.warning("Ignoring invalid user dictionary %s: %s", user_dict_path, e)
+        return {}
 
 
 def load_custom_syllable_dict():
-    """Loads the custom syllable dictionary, prioritizing user overrides.
+    """Loads the custom syllable dictionary: package defaults, overridden by any
+    entries the user has added."""
+    return {**load_default_dict(), **load_user_dict()}
 
-    Loads the dictionary from the user's config directory if it exists,
-    otherwise loads the default dictionary from the package resources.
-    """
+
+def _save_user_dict(entries):
     user_dict_path = _get_user_dict_path()
-    default_dict_path = _get_default_dict_path()
-    loaded_dict = {}
-
-    try:
-        with open(user_dict_path, "r", encoding="utf-8") as f:
-            user_data = json.load(f)
-            if "CUSTOM_SYLLABLE_DICT" in user_data:
-                # Convert keys to lowercase when loading from user dict
-                loaded_dict.update(
-                    {k.lower(): v for k, v in user_data["CUSTOM_SYLLABLE_DICT"].items()}
-                )
-                print(f"Loaded custom dictionary from user config: {user_dict_path}")
-                return loaded_dict  # User dict takes precedence
-    except FileNotFoundError:
-        pass  # User dict is optional
-
-    try:
-        default_dict_string = _read_package_resource(default_dict_path).decode("utf-8")
-        default_data = json.loads(default_dict_string)
-        if "CUSTOM_SYLLABLE_DICT" in default_data:
-            loaded_dict.update(
-                {k.lower(): v for k, v in default_data["CUSTOM_SYLLABLE_DICT"].items()}
-            )
-    except FileNotFoundError:
-        print(
-            f"Error: Default custom syllable dictionary file not found in package at "
-            f"{default_dict_path}."
-        )
-    except json.JSONDecodeError as e:
-        print(
-            f"Error: Invalid JSON format in default dictionary file at {default_dict_path}. "
-            f"Error: {e}"
-        )
-
-    return loaded_dict
+    os.makedirs(os.path.dirname(user_dict_path), exist_ok=True)
+    with open(user_dict_path, "w", encoding="utf-8") as outfile:
+        json.dump({DICT_KEY: entries}, outfile, indent=4)
+    return user_dict_path
 
 
 def overwrite_custom_dict(file_path):
-    """Overwrites the user's custom dictionary with the contents of a given JSON file."""
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            new_dict_data = json.load(f)
-            if (
-                not isinstance(new_dict_data, dict)
-                or "CUSTOM_SYLLABLE_DICT" not in new_dict_data
-            ):
-                raise ValueError(
-                    "Invalid dictionary format in provided file.  "
-                    "Should be a JSON with 'CUSTOM_SYLLABLE_DICT' key."
-                )
-            user_dict_path = _get_user_dict_path()
-            with open(user_dict_path, "w", encoding="utf-8") as outfile:
-                json.dump(new_dict_data, outfile, indent=4)
-            print(
-                f"Custom dictionary overwritten with file: {file_path}. Saved to {user_dict_path}"
-            )
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {file_path}")
-    except json.JSONDecodeError:
-        raise json.JSONDecodeError(f"Invalid JSON in file: {file_path}", "", 0)
-    except ValueError as ve:
-        raise ve
-    except Exception as e:
-        raise Exception(
-            f"An unexpected error occurred during dictionary overwrite: {e}"
-        )
+    """Replaces all of the user's entries with the contents of a JSON file.
+    The package defaults still apply to words the file doesn't list."""
+    user_dict_path = _save_user_dict(_read_dict_file(file_path))
+    logger.info("User dictionary replaced from %s: %s", file_path, user_dict_path)
 
 
 def add_term_to_custom_dict(word, syllable_count):
     """Adds a single term to the user's custom dictionary."""
-    if not isinstance(syllable_count, int) or syllable_count < 1:
+    if not _is_positive_int(syllable_count):
         raise ValueError("Syllable count must be a positive integer.")
 
-    user_dict_path = _get_user_dict_path()
-    current_dict = load_custom_syllable_dict()
-
-    current_dict[word] = syllable_count
-
-    dict_data_to_save = {
-        "CUSTOM_SYLLABLE_DICT": current_dict
-    }  # Re-wrap for JSON structure
-    try:
-        with open(user_dict_path, "w", encoding="utf-8") as outfile:
-            json.dump(dict_data_to_save, outfile, indent=4)
-        print(
-            f"Added term '{word}': {syllable_count} syllables to custom dictionary. "
-            f"Saved to {user_dict_path}"
-        )
-    except Exception as e:
-        raise Exception(f"Error saving updated custom dictionary: {e}")
+    entries = load_user_dict()
+    entries[_normalize_word(word)] = syllable_count
+    user_dict_path = _save_user_dict(entries)
+    logger.info("Added '%s' (%d syllables): %s", word, syllable_count, user_dict_path)
 
 
 def add_terms_from_file(file_path):
     """Adds multiple terms from a JSON file to the user's custom dictionary."""
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            full_json_data = json.load(f)
-
-        if "CUSTOM_SYLLABLE_DICT" not in full_json_data:
-            raise ValueError(
-                "Invalid dictionary format in provided file. "
-                "Should be a JSON with 'CUSTOM_SYLLABLE_DICT' key containing a dictionary."
-            )
-
-        new_terms_data = full_json_data["CUSTOM_SYLLABLE_DICT"]
-
-        if not isinstance(new_terms_data, dict):
-            raise ValueError(
-                "Invalid dictionary format in provided file. "
-                "The value associated with 'CUSTOM_SYLLABLE_DICT' key must be a dictionary."
-            )
-
-        current_dict = load_custom_syllable_dict()
-        current_dict.update(new_terms_data)
-
-        dict_data_to_save = {"CUSTOM_SYLLABLE_DICT": current_dict}
-        user_dict_path = _get_user_dict_path()
-
-        with open(user_dict_path, "w", encoding="utf-8") as outfile:
-            json.dump(dict_data_to_save, outfile, indent=4)
-        print(
-            f"Added terms from file: {file_path}. Updated dictionary saved to {user_dict_path}"
-        )
-
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {file_path}")
-    except json.JSONDecodeError:
-        raise json.JSONDecodeError(f"Invalid JSON in file: {file_path}", "", 0)
-    except ValueError as ve:
-        raise ve
-    except Exception as e:
-        raise Exception(f"Error adding terms from file: {e}")
+    entries = load_user_dict()
+    entries.update(_read_dict_file(file_path))
+    user_dict_path = _save_user_dict(entries)
+    logger.info("Added terms from %s. Saved to %s", file_path, user_dict_path)
 
 
 def print_custom_dict():
     """Prints the currently loaded custom dictionary to the console."""
-    current_dict = load_custom_syllable_dict()
-    print(
-        json.dumps({"CUSTOM_SYLLABLE_DICT": current_dict}, indent=4)
-    )  # Print in readable JSON format
+    print(json.dumps({DICT_KEY: load_custom_syllable_dict()}, indent=4))
 
 
 def revert_custom_dict_to_default():
-    """Reverts the user's custom dictionary to the default dictionary
-    that is included with the package. This effectively removes any
-    customizations made by the user.
-    """
+    """Removes all of the user's entries, leaving only the package defaults."""
     user_dict_path = _get_user_dict_path()
-    default_dict_path = _get_default_dict_path()
-
     try:
-        # Load the default dictionary content from the package resource
-        resource_path = _get_default_dict_path()
-        json_data = _read_package_resource(resource_path).decode("utf-8")
-        default_dict_data = json.loads(json_data)
-
-        # Write the default dictionary content to the user's custom dictionary path,
-        # effectively overwriting the user's customizations.
-        with open(user_dict_path, "w", encoding="utf-8") as outfile:
-            json.dump(default_dict_data, outfile, indent=4)
-
-        print(
-            f"Custom dictionary reverted to the default package dictionary. "
-            f"User customizations have been removed from: {user_dict_path}"
-        )
-
+        os.remove(user_dict_path)
     except FileNotFoundError:
-        raise FileNotFoundError(
-            f"Default dictionary file not found in package at: {default_dict_path}"
-        )
-    except json.JSONDecodeError:
-        raise json.JSONDecodeError(
-            f"Invalid JSON in default dictionary file at: {default_dict_path}", "", 0
-        )
-    except Exception as e:
-        raise Exception(f"Error reverting custom dictionary to default: {e}")
+        pass
+    logger.info("User dictionary removed: %s", user_dict_path)

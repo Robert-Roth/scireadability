@@ -4,13 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"repoze.lru" = "*"
-setuptools = "*"
-appdirs = "*"
+platformdirs = "*"
 
 [dev-packages]
 flake8 = "*"
 ipython = "*"
 pytest = "*"
-wheel = "*"
 twine = "*"
+build = "*"

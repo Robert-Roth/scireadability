@@ -5,52 +5,32 @@
 
 import json
 import os
-import shutil
 from scireadability import dictionary_utils
 import scireadability
 import pytest
 
 
 # --- Fixture for setup and teardown ---
-@pytest.fixture(scope="function")
-def test_env():
-    """Fixture to set up test environment (temp dirs, mocks) and teardown."""
-    test_config_dir = os.path.join(os.getcwd(), "test_config_dir")
-    test_resources_dir = os.path.join(os.getcwd(), "test_resources_dir")
-    os.makedirs(test_config_dir, exist_ok=True)
-    os.makedirs(test_resources_dir, exist_ok=True)
+@pytest.fixture
+def test_env(tmp_path, monkeypatch):
+    """Points the user config dir and package resources at temporary dirs."""
+    test_config_dir = tmp_path / "config"
+    test_resources_dir = tmp_path / "resources"
+    test_config_dir.mkdir()
+    (test_resources_dir / "resources" / "en").mkdir(parents=True)
 
-    # --- Create necessary directories for default dictionaries within test_resources_dir ---
-    default_dict_en_dir = os.path.join(
-        test_resources_dir, "resources", "en"
-    )  # Path to en default dict dir
-    os.makedirs(default_dict_en_dir, exist_ok=True)  # Create it
-
-    original_user_config_dir = dictionary_utils.user_config_dir
-    original_read_resource = dictionary_utils._read_package_resource
-    dictionary_utils.user_config_dir = lambda package_name: test_config_dir
-    dictionary_utils._read_package_resource = lambda resource_path: (
-        _mock_resource_string(test_resources_dir, resource_path)
+    monkeypatch.setenv(dictionary_utils.CONFIG_DIR_ENV_VAR, str(test_config_dir))
+    monkeypatch.setattr(
+        dictionary_utils,
+        "_read_package_resource",
+        lambda resource_path: _mock_resource_string(test_resources_dir, resource_path),
     )
-
-    yield test_config_dir, test_resources_dir
-
-    # --- Teardown ---
-    dictionary_utils.user_config_dir = original_user_config_dir
-    dictionary_utils._read_package_resource = original_read_resource
-    if os.path.exists(test_config_dir):
-        shutil.rmtree(test_config_dir)
-    if os.path.exists(test_resources_dir):
-        shutil.rmtree(test_resources_dir)
+    yield str(test_config_dir), str(test_resources_dir)
 
 
 def _mock_resource_string(test_resources_dir, resource_path):
     """Mock for _read_package_resource to use test resources."""
-    full_resource_path = os.path.join(test_resources_dir, resource_path)
-    if not os.path.exists(full_resource_path):
-        raise FileNotFoundError(f"Resource not found: {full_resource_path}")
-    with open(full_resource_path, "r", encoding="utf-8") as f:
-        return f.read().encode("utf-8")
+    return (test_resources_dir / resource_path).read_bytes()
 
 
 # --- Test Text Samples ---
@@ -229,7 +209,7 @@ def test_avg_sentence_length():
 def test_avg_syllables_per_word():
     scireadability.set_rounding(False)
     avg = scireadability.avg_syllables_per_word(long_test)
-    assert avg == 1.4623655913978495
+    assert avg == 1.456989247311828
     scireadability.set_rounding(False)
 
 
@@ -250,14 +230,14 @@ def test_avg_sentence_per_word():
 def test_flesch_reading_ease():
     scireadability.set_rounding(False)
     score = scireadability.flesch_reading_ease(long_test)
-    assert score == 60.90828273244783
+    assert score == 61.36312144212525
     scireadability.set_rounding(False)
 
 
 def test_flesch_kincaid_grade():
     scireadability.set_rounding(False)
     score = scireadability.flesch_kincaid_grade(long_test)
-    assert score == 10.20003162555345
+    assert score == 10.136590765338397
     scireadability.set_rounding(False)
 
 
@@ -283,7 +263,7 @@ def test_coleman_liau_index():
 def test_automated_readability_index():
     scireadability.set_rounding(False)
     index = scireadability.automated_readability_index(long_test)
-    assert index == 11.643111954459208
+    assert index == 10.858111954459204
     scireadability.set_rounding(False)
 
 
@@ -296,7 +276,7 @@ def test_linsear_write_formula():
 
 def test_difficult_words():
     result = scireadability.difficult_words(long_test)
-    assert result == 67
+    assert result == 50
 
 
 def test_difficult_words_list():
@@ -317,7 +297,7 @@ def test_is_easy_word():
 def test_dale_chall_readability_score():
     scireadability.set_rounding(False)
     score = scireadability.dale_chall_readability_score(long_test)
-    assert score == 8.499579759645794
+    assert score == 7.013961480075902
     score = scireadability.dale_chall_readability_score(empty_str)
     assert score == 0.0
     scireadability.set_rounding(False)
@@ -349,11 +329,65 @@ def test_rix():
 def test_text_standard():
     # Test with the long text sample
     standard_long = scireadability.text_standard(long_test)
-    assert standard_long == "11th and 12th grade"
+    assert standard_long == "10th and 11th grade"
 
     # Test with the short text sample
     standard_short = scireadability.text_standard(short_test)
     assert standard_short == "2nd and 3rd grade"
+
+
+def test_automated_readability_index_ignores_punctuation():
+    plain = scireadability.automated_readability_index("The cat sat on the mat today")
+    punctuated = scireadability.automated_readability_index(
+        "The cat, sat; on the mat: today!"
+    )
+    assert plain == punctuated
+
+
+@pytest.mark.parametrize(
+    "score,grades",
+    [(120.0, [5]), (100.0, [5]), (95.0, [5]), (65.0, [8, 9]), (10.0, [13])],
+)
+def test_fre_score_to_grades(score, grades):
+    # Flesch Reading Ease of 100+ must map to the easiest band, not college.
+    assert scireadability.scireadability._fre_score_to_grades(score) == grades
+
+
+def test_text_standard_skips_smog_for_short_text():
+    # SMOG's 0.0 "not applicable" value must not vote for grade 0.
+    text = "Go home now please. We are done for today."
+    assert scireadability.smog_index(text) == 0.0
+    assert scireadability.text_standard(text, as_string=False) > 0
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Ants like C. atratus eat sugar. They are small ants.",
+        "We tested many samples, e.g. blood and urine. It worked well.",
+        "Smith et al. found that the protein binds DNA. We agree with them.",
+        "The buffer was held at pH 7.4 for three hours. Then we stopped.",
+        'He said "it is done now." Then they all went home.',
+    ],
+)
+def test_sentence_count_abbreviations(text):
+    assert scireadability.sentence_count(text) == 2
+
+
+def test_forcast_short_text_is_scaled():
+    text = "the cat sat on the mat and the dog ran to me so we all went home"
+    with pytest.warns(UserWarning):
+        # Every word is monosyllabic, so the scaled score is the minimum (5.0).
+        assert scireadability.forcast(text) == 5.0
+
+
+def test_forcast_no_words():
+    assert scireadability.forcast("!!!") == 0.0
+
+
+def test_reading_time_invalid_wpm():
+    with pytest.raises(ValueError):
+        scireadability.reading_time(long_test, wpm=0)
 
 
 def test_reading_time():
@@ -413,7 +447,7 @@ def test_unicode_support():
 
 def test_spache_readability():
     spache = scireadability.spache_readability(easy_text, float_output=False)
-    assert spache == 3
+    assert spache == 2
     score = scireadability.spache_readability(empty_str)
     assert score == 0.0
 
@@ -458,7 +492,7 @@ def test_empty_string_handling():
 
     # Test special cases
     assert scireadability.linsear_write_formula(empty_str) == -1.0
-    assert scireadability.text_standard(empty_str) == "0th grade"
+    assert scireadability.text_standard(empty_str) == "N/A"
 
 
 # --- Dictionary Util Tests ---
@@ -517,3 +551,82 @@ def test_overwrite_custom_dict_valid_json_file(test_env):
     loaded_dict = dictionary_utils.load_custom_syllable_dict()
 
     assert loaded_dict == new_dict_content["CUSTOM_SYLLABLE_DICT"]
+
+
+def test_user_dict_is_layered_over_defaults(test_env):
+    _, test_resources_dir = test_env
+    default_dict_path = dictionary_utils._get_default_dict_path()
+    with open(
+        os.path.join(test_resources_dir, default_dict_path), "w", encoding="utf-8"
+    ) as f:
+        json.dump({"CUSTOM_SYLLABLE_DICT": {"defaultword": 2, "sharedword": 2}}, f)
+
+    dictionary_utils.add_term_to_custom_dict("sharedword", 5)
+    dictionary_utils.add_term_to_custom_dict("userword", 3)
+
+    # Only the user's own entries are saved, so later default updates still apply.
+    assert dictionary_utils.load_user_dict() == {"sharedword": 5, "userword": 3}
+    assert dictionary_utils.load_custom_syllable_dict() == {
+        "defaultword": 2,
+        "sharedword": 5,
+        "userword": 3,
+    }
+
+    dictionary_utils.revert_custom_dict_to_default()
+    assert dictionary_utils.load_custom_syllable_dict() == {
+        "defaultword": 2,
+        "sharedword": 2,
+    }
+
+
+def test_add_term_normalizes_word(test_env):
+    dictionary_utils.add_term_to_custom_dict("COVID-19", 4)
+    assert dictionary_utils.load_user_dict() == {"covid19": 4}
+
+
+def test_add_terms_from_file_rejects_invalid_counts(test_env):
+    test_config_dir, _ = test_env
+    bad_file = os.path.join(test_config_dir, "bad.json")
+    with open(bad_file, "w", encoding="utf-8") as f:
+        json.dump({"CUSTOM_SYLLABLE_DICT": {"word": 0}}, f)
+    with pytest.raises(ValueError):
+        dictionary_utils.add_terms_from_file(bad_file)
+
+
+def test_invalid_user_dict_is_ignored(test_env):
+    user_dict_path = dictionary_utils._get_user_dict_path()
+    os.makedirs(os.path.dirname(user_dict_path))
+    with open(user_dict_path, "w", encoding="utf-8") as f:
+        f.write("invalid json")
+    assert dictionary_utils.load_user_dict() == {}
+
+
+def test_loading_does_not_create_config_dir(test_env):
+    dictionary_utils.load_custom_syllable_dict()
+    assert not os.path.exists(os.path.dirname(dictionary_utils._get_user_dict_path()))
+
+
+def test_hyphenated_words():
+    # Parts are counted separately, but the compound is still one word.
+    assert scireadability.syllable_count("well-balanced") == 3
+    assert scireadability.lexicon_count("well-balanced") == 1
+    # Custom dictionary entries are matched without hyphens ("covid19").
+    assert scireadability.syllable_count("COVID-19") == 4
+    assert scireadability.difficult_words_list("state-of-the-art") == [
+        "state-of-the-art"
+    ]
+
+
+def test_curly_apostrophe():
+    assert scireadability.remove_punctuation("don\u2019t") == "don't"
+
+
+@pytest.mark.parametrize(
+    "word", ["dogs", "puzzles", "playing", "stopped", "bigger", "babies", "sadly"]
+)
+def test_inflections_of_easy_words_are_easy(word):
+    assert scireadability.is_easy_word(word, syllable_threshold=0)
+
+
+def test_linsear_write_no_words():
+    assert scireadability.linsear_write_formula("!!!") == -1.0
